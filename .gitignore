@@ -5,12 +5,17 @@ __pycache__/
 .venv/
 venv/
 
-# โมเดลที่เทรนแล้ว (สร้างใหม่ได้ด้วย python train_model.py)
+# โมเดล .pkl (สร้างใหม่ได้ด้วย python ml/train_model.py)
+# ไฟล์ที่แอปใช้จริงคือ android/app/src/main/assets/scam_model.json ซึ่ง commit ไว้
 *.pkl
+
+# ข้อมูลที่ผู้ใช้ส่งออกจากแอป — ห้ามขึ้น repo เด็ดขาด (docs/SECURITY_POLICY.md ข้อ 5)
+ml/data/contributed/
 
 # ไฟล์ระบบ
 .DS_Store
 Thumbs.db
 
-# Claude Code (เฉพาะเครื่อง ไม่ต้องขึ้น repo)
+# เครื่องมือเฉพาะเครื่อง
 .claude/
+.sixth/

@@ -1,4 +1,0 @@
-pythainlp
-scikit-learn
-joblib
-numpy

@@ -1,0 +1,2 @@
+# ใช้เฉพาะ  python predict.py --wav ไฟล์เสียง  (ถอดเสียงไทยแบบออฟไลน์)
+faster-whisper

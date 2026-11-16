@@ -45,6 +45,8 @@ class MainActivity : ComponentActivity() {
             }
         }
         intent.getStringExtra(Alerts.EXTRA_ANALYZE_URI)?.let { return LaunchRequest.AnalyzeUri(Uri.parse(it)) }
+        // แตะการแจ้งเตือน "สายเมื่อกี้เสี่ยง" ที่จับคู่เบอร์ได้ -> ไปหน้ารายงานเบอร์
+        intent.getStringExtra(Alerts.EXTRA_REPORT_NUMBER)?.let { return LaunchRequest.ReportNumber(it) }
         val recordId = intent.getLongExtra(Alerts.EXTRA_OPEN_RECORD_ID, -1L)
         if (recordId > 0) return LaunchRequest.OpenRecord(recordId)
         return null

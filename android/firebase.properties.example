@@ -1,0 +1,6 @@
+# คัดลอกไฟล์นี้เป็น firebase.properties (อยู่โฟลเดอร์ android/) แล้วใส่ค่าจาก Firebase Console
+# Project settings -> General -> Your apps -> Android app (com.panuwatki.safe)
+# ไม่มีไฟล์นี้ = แอปใช้สมุดเบอร์แบบในเครื่องอย่างเดียว (ปุ่มฐานข้อมูลชุมชนจะไม่แสดง)
+projectId=
+appId=
+apiKey=

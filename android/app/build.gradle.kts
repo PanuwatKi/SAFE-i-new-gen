@@ -1,4 +1,13 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
+
+// ค่า Firebase (ไม่บังคับ) — ถ้าไม่มีไฟล์นี้ แอปยัง build ได้ และใช้สมุดเบอร์แบบในเครื่องอย่างเดียว
+// วิธีสร้างไฟล์: docs/FIREBASE_SETUP.md
+val firebaseProps = Properties().apply {
+    val f = rootProject.file("firebase.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+fun fb(key: String): String = "\"" + (firebaseProps.getProperty(key) ?: "") + "\""
 
 plugins {
     alias(libs.plugins.android.application)
@@ -16,8 +25,12 @@ android {
         applicationId = "com.panuwatki.safe"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0"
+
+        buildConfigField("String", "FIREBASE_PROJECT_ID", fb("projectId"))
+        buildConfigField("String", "FIREBASE_APP_ID", fb("appId"))
+        buildConfigField("String", "FIREBASE_API_KEY", fb("apiKey"))
     }
 
     buildTypes {
@@ -36,6 +49,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -59,6 +73,14 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.kotlinx.serialization.json)
+
+    // ฐานข้อมูลเบอร์ชุมชน (ใช้เฉพาะเมื่อผู้ใช้เปิดเอง)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.appcheck.playintegrity)
+    debugImplementation(libs.firebase.appcheck.debug)
+    implementation(libs.kotlinx.coroutines.play.services)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)

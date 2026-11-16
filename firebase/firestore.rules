@@ -1,0 +1,74 @@
+rules_version = '2';
+
+// กฎความปลอดภัยของฐานข้อมูลเบอร์ชุมชน SAFE
+// วิธีใช้: Firebase Console > Firestore Database > Rules > วางไฟล์นี้ทั้งหมด > Publish
+//
+// โครงสร้าง:
+//   numbers/{hash}                { scam: int, spam: int, updatedAt: timestamp }   อ่านได้ทุกคนที่ล็อกอินนิรนาม
+//   numbers/{hash}/reports/{uid}  { type, category, createdAt }                    1 คนรายงาน 1 เบอร์ได้ครั้งเดียว
+//   users/{uid}                   { day: int, count: int }                         จำกัดวันละ 20 รายงาน
+// ข้อมูลทั้งหมดถูกเขียนพร้อมกันใน transaction เดียว (CommunityReports.report)
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function today() { return int(request.time.toMillis() / 86400000); }
+    function userPath() { return /databases/$(database)/documents/users/$(request.auth.uid); }
+    function reportPath(hash) { return /databases/$(database)/documents/numbers/$(hash)/reports/$(request.auth.uid); }
+
+    // จำนวนรายงานของวันนี้ต้องเพิ่มทีละ 1 และไม่เกิน 20
+    function userCountOk() {
+      let before = exists(userPath()) ? get(userPath()).data : {'day': -1, 'count': 0};
+      let after = getAfter(userPath()).data;
+      return after.day == today()
+        && after.count <= 20
+        && after.count == (before.day == today() ? before.count + 1 : 1);
+    }
+
+    match /numbers/{hash} {
+      allow read: if signedIn();
+
+      // ตัวนับเพิ่มได้ทีละ 1 เฉพาะตอนที่ผู้ใช้คนนี้สร้างรายงานของตัวเองใน transaction เดียวกัน
+      allow create, update: if signedIn()
+        && hash.matches('^[0-9a-f]{64}$')
+        && !exists(reportPath(hash))
+        && existsAfter(reportPath(hash))
+        && request.resource.data.keys().hasOnly(['scam', 'spam', 'updatedAt'])
+        && request.resource.data.updatedAt == request.time
+        && countersOk(hash);
+
+      function countersOk(hash) {
+        let type = getAfter(reportPath(hash)).data.type;
+        let oldScam = resource == null ? 0 : resource.data.get('scam', 0);
+        let oldSpam = resource == null ? 0 : resource.data.get('spam', 0);
+        let newScam = request.resource.data.get('scam', 0);
+        let newSpam = request.resource.data.get('spam', 0);
+        return (type == 'scam' && newScam == oldScam + 1 && newSpam == oldSpam)
+            || (type == 'spam' && newSpam == oldSpam + 1 && newScam == oldScam);
+      }
+
+      match /reports/{uid} {
+        // ผู้รายงานอ่านได้แค่รายงานของตัวเอง (ไว้เช็กว่าเคยรายงานหรือยัง) คนอื่นอ่านไม่ได้
+        allow read: if signedIn() && request.auth.uid == uid;
+        allow create: if signedIn()
+          && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['type', 'category', 'createdAt'])
+          && request.resource.data.type in ['scam', 'spam']
+          && request.resource.data.category is string
+          && request.resource.data.category.size() <= 40
+          && request.resource.data.createdAt == request.time
+          && userCountOk();
+        // ไม่มีการแก้ไข/ลบจากแอป (ลบได้เฉพาะผู้ดูแลผ่าน Console ตามคำขอ)
+      }
+    }
+
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['day', 'count'])
+        && userCountOk();
+    }
+  }
+}

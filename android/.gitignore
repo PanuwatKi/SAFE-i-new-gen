@@ -11,3 +11,6 @@ captures/
 *.jks
 *.keystore
 keystore.properties
+
+# ค่า Firebase ของแต่ละคน (ดู docs/FIREBASE_SETUP.md)
+firebase.properties

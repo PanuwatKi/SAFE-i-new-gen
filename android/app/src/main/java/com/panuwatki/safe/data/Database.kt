@@ -63,18 +63,29 @@ interface AnalysisDao {
     suspend fun purgeUnlabeledBefore(before: Long): Int
 }
 
-@Database(entities = [AnalysisEntity::class], version = 1, exportSchema = false)
+@Database(
+    entities = [AnalysisEntity::class, NumberEntry::class, RecentCall::class, CommunityFlag::class],
+    version = 2,
+    exportSchema = false,
+)
 abstract class SafeDatabase : RoomDatabase() {
     abstract fun analyses(): AnalysisDao
+    abstract fun numbers(): NumberDao
 
     companion object {
         /** ผลที่ผู้ใช้ไม่ได้ยืนยัน จะถูกลบอัตโนมัติหลังจากนี้ (ดู docs/SECURITY_POLICY.md) */
         const val RETENTION_DAYS = 30L
 
+        /** เบอร์ไม่รู้จักที่โทรเข้า เก็บไว้กี่วัน (ดู docs/SECURITY_POLICY.md) */
+        const val RECENT_DAYS = 7L
+
         @Volatile private var instance: SafeDatabase? = null
 
         fun get(context: Context): SafeDatabase = instance ?: synchronized(this) {
             instance ?: Room.databaseBuilder(context.applicationContext, SafeDatabase::class.java, "safe.db")
+                // ⚠️ ยังไม่เปิดตัวบน Play จึงล้างฐานข้อมูลเมื่อเปลี่ยนโครงสร้างได้
+                // ก่อนเผยแพร่จริง ต้องเปลี่ยนเป็น Migration ที่เก็บข้อมูลผู้ใช้ไว้
+                .fallbackToDestructiveMigration(dropAllTables = true)
                 .build()
                 .also { instance = it }
         }

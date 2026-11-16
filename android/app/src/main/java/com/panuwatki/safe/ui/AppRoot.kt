@@ -35,12 +35,16 @@ sealed interface Screen {
     data class Record(val id: Long) : Screen
     data object Settings : Screen
     data object Privacy : Screen
+    data object Numbers : Screen
+    data class NumberEdit(val number: String?) : Screen
+    data object Official : Screen
 }
 
 /** สิ่งที่ MainActivity ส่งเข้ามาจาก Intent (แชร์ไฟล์เสียง / แตะการแจ้งเตือน) */
 sealed interface LaunchRequest {
     data class AnalyzeUri(val uri: Uri) : LaunchRequest
     data class OpenRecord(val id: Long) : LaunchRequest
+    data class ReportNumber(val number: String) : LaunchRequest
 }
 
 @Composable
@@ -59,6 +63,7 @@ fun AppRoot(launchRequest: LaunchRequest?, onLaunchHandled: () -> Unit, vm: Main
         when (launchRequest) {
             is LaunchRequest.AnalyzeUri -> { vm.resetFile(); go(Screen.Analyze(launchRequest.uri)) }
             is LaunchRequest.OpenRecord -> go(Screen.Record(launchRequest.id))
+            is LaunchRequest.ReportNumber -> go(Screen.NumberEdit(launchRequest.number))
         }
         onLaunchHandled()
     }
@@ -129,6 +134,13 @@ fun AppRoot(launchRequest: LaunchRequest?, onLaunchHandled: () -> Unit, vm: Main
                     onDataDeleted = { stack.clear(); stack.add(Screen.Home) },
                 )
                 Screen.Privacy -> PrivacyScreen(onBack = ::back)
+                Screen.Numbers -> NumbersScreen(
+                    vm, onBack = ::back,
+                    onEdit = { go(Screen.NumberEdit(it)) },
+                    onOfficial = { go(Screen.Official) },
+                )
+                is Screen.NumberEdit -> NumberEditScreen(vm, s.number, onBack = ::back)
+                Screen.Official -> OfficialNumbersScreen(onBack = ::back)
             }
         }
     }

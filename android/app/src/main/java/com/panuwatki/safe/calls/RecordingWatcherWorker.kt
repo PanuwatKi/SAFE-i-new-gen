@@ -10,6 +10,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.panuwatki.safe.SafeEngine
 import com.panuwatki.safe.data.Prefs
+import com.panuwatki.safe.data.SafeDatabase
 import com.panuwatki.safe.ml.RiskColor
 import com.panuwatki.safe.notify.Alerts
 import java.time.Duration
@@ -36,7 +37,15 @@ class RecordingWatcherWorker(context: Context, params: WorkerParameters) : Corou
                 when (val outcome = SafeEngine.analyzeRecording(ctx, rec.uri)) {
                     is SafeEngine.RecordingOutcome.Success ->
                         if (outcome.state.peakColor != RiskColor.GREEN) {
-                            Alerts.conversationRisk(ctx, outcome.state.peakColor, outcome.state.peak, outcome.suspiciousWords, outcome.id)
+                            // จับคู่กับเบอร์ไม่รู้จักที่โทรเข้าช่วงเดียวกัน (ไฟล์บันทึกเสร็จตอนวางสาย)
+                            val callStart = rec.addedAtMs - rec.durationMs
+                            val caller = SafeDatabase.get(ctx).numbers()
+                                .recentBetween(callStart - MATCH_WINDOW_MS, rec.addedAtMs)
+                            Alerts.conversationRisk(
+                                ctx, outcome.state.peakColor, outcome.state.peak, outcome.suspiciousWords, outcome.id,
+                                callerNumber = caller?.number,
+                                numberLookedSafe = caller?.level == NumberRiskLevel.NONE.name,
+                            )
                         }
                     is SafeEngine.RecordingOutcome.NoSpeech -> Unit
                     is SafeEngine.RecordingOutcome.Failure -> Alerts.tapToCheckRecording(ctx, rec.uri)
@@ -53,6 +62,8 @@ class RecordingWatcherWorker(context: Context, params: WorkerParameters) : Corou
     companion object {
         private const val NAME = "call-recording-watcher"
         private const val FIRST_SCAN_WINDOW_MS = 10 * 60 * 1000L
+        /** เผื่อเวลาระหว่างเสียงเรียกเข้ากับเริ่มอัดเสียง */
+        private const val MATCH_WINDOW_MS = 3 * 60 * 1000L
 
         fun schedule(context: Context) = enqueue(context, ExistingWorkPolicy.KEEP)
 

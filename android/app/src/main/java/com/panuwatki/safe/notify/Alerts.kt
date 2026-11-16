@@ -15,8 +15,8 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.panuwatki.safe.MainActivity
 import com.panuwatki.safe.R
-import com.panuwatki.safe.calls.NumberRisk
-import com.panuwatki.safe.calls.NumberRiskLevel
+import com.panuwatki.safe.calls.CallerCheck
+import com.panuwatki.safe.calls.PhoneNumbers
 import com.panuwatki.safe.ml.RiskColor
 
 /** การแจ้งเตือนทั้งหมดของแอป (ข้อความสั้น ชัด อ่านง่ายสำหรับผู้สูงอายุ) */
@@ -29,6 +29,7 @@ object Alerts {
 
     const val EXTRA_OPEN_RECORD_ID = "open_record_id"
     const val EXTRA_ANALYZE_URI = "analyze_uri"
+    const val EXTRA_REPORT_NUMBER = "report_number"
 
     fun createChannels(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
@@ -44,12 +45,24 @@ object Alerts {
         )
     }
 
-    fun numberWarning(context: Context, risk: NumberRisk) {
-        val title = if (risk.level == NumberRiskLevel.HIGH) "🔴 ระวัง! สายนี้เสี่ยงมิจฉาชีพ" else "🟡 ระวังสายนี้"
-        notify(context, ID_NUMBER, CHANNEL_ALERT, title, risk.reason, openAppIntent(context, null))
+    fun numberWarning(context: Context, decision: CallerCheck.Decision) {
+        val body = if (decision.reject) "${decision.reason}\nSAFE ตัดสายนี้ให้แล้วตามที่คุณตั้งไว้" else decision.reason
+        notify(context, ID_NUMBER, CHANNEL_ALERT, decision.title, body, openAppIntent(context, null))
     }
 
-    fun conversationRisk(context: Context, color: RiskColor, percent: Double, words: List<String>, recordId: Long) {
+    /**
+     * @param callerNumber เบอร์ที่โทรเข้าช่วงเวลาเดียวกับไฟล์อัดเสียง (ถ้าหาเจอ) -> แตะแล้วไปหน้ารายงานเบอร์
+     * @param numberLookedSafe เบอร์ไม่ติดกฎใดเลย แต่เนื้อหาเสี่ยง -> เตือนว่าเบอร์อาจถูกปลอม
+     */
+    fun conversationRisk(
+        context: Context,
+        color: RiskColor,
+        percent: Double,
+        words: List<String>,
+        recordId: Long,
+        callerNumber: String? = null,
+        numberLookedSafe: Boolean = false,
+    ) {
         val title = when (color) {
             RiskColor.RED -> "🔴 สายเมื่อกี้เสี่ยงมิจฉาชีพสูงมาก (${percent.toInt()}%)"
             RiskColor.YELLOW -> "🟡 สายเมื่อกี้น่าสงสัย (${percent.toInt()}%)"
@@ -57,9 +70,14 @@ object Alerts {
         }
         val body = buildString {
             append("ห้ามโอนเงิน ห้ามบอกรหัส OTP ห้ามกดลิงก์ ถ้าไม่แน่ใจ โทรถามลูกหลานหรือสายด่วน 1441")
+            if (callerNumber != null && numberLookedSafe) {
+                append("\nแม้เบอร์ ${PhoneNumbers.display(callerNumber)} จะดูปกติ แต่เนื้อหาเข้าข่ายมิจฉาชีพ เบอร์ที่โชว์อาจถูกปลอม")
+            }
             if (words.isNotEmpty()) append("\nคำที่น่าสงสัย: ").append(words.joinToString(" "))
+            if (callerNumber != null) append("\nแตะเพื่อรายงานเบอร์นี้")
         }
         val intent = openAppIntent(context, null).putExtra(EXTRA_OPEN_RECORD_ID, recordId)
+        if (callerNumber != null) intent.putExtra(EXTRA_REPORT_NUMBER, callerNumber)
         notify(context, ID_CONVERSATION, CHANNEL_ALERT, title, body, intent)
     }
 

@@ -9,7 +9,14 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.panuwatki.safe.SafeEngine
+import com.panuwatki.safe.calls.CallerCheck
+import com.panuwatki.safe.calls.PhoneNumbers
 import com.panuwatki.safe.calls.RecordingWatcherWorker
+import com.panuwatki.safe.cloud.CommunityReports
+import com.panuwatki.safe.data.NumberBookFile
+import com.panuwatki.safe.data.NumberEntry
+import com.panuwatki.safe.data.RecentCall
+import kotlinx.serialization.json.Json
 import com.panuwatki.safe.data.AnalysisEntity
 import com.panuwatki.safe.data.CsvExporter
 import com.panuwatki.safe.data.Prefs
@@ -151,6 +158,101 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    // ---------------- สมุดเบอร์ / สายล่าสุด / ชุมชน ----------------
+    private val numberDao = SafeDatabase.get(app).numbers()
+
+    val numberBook: StateFlow<List<NumberEntry>> =
+        numberDao.observeBook().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val recentCalls: StateFlow<List<RecentCall>> =
+        numberDao.observeRecent().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    var communityEnabled by mutableStateOf(prefs.communityEnabled && CommunityReports.isConfigured())
+        private set
+    var communityStatus by mutableStateOf("")
+        private set
+
+    suspend fun numberEntry(number: String): NumberEntry? = numberDao.find(number)
+
+    /**
+     * บันทึกเบอร์ลงสมุด และ (ถ้าผู้ใช้เลือก) รายงานขึ้นฐานข้อมูลชุมชน
+     * @return ข้อความแจ้งผล
+     */
+    fun saveNumber(entry: NumberEntry, reportToCommunity: Boolean, onDone: (String) -> Unit) {
+        viewModelScope.launch {
+            var message = "บันทึกเบอร์แล้ว"
+            var reported = entry.reportedToCommunity
+            if (reportToCommunity && !reported && entry.label != CallerCheck.BookLabel.TRUSTED.name) {
+                val type = if (entry.label == CallerCheck.BookLabel.SCAM.name) CommunityReports.Type.SCAM else CommunityReports.Type.SPAM
+                val result = CommunityReports.report(getApplication(), entry.number, type, entry.category)
+                message = result.fold(
+                    onSuccess = { reported = true; "บันทึกแล้ว และรายงานไปยังชุมชนแล้ว ขอบคุณที่ช่วยเตือนคนอื่น" },
+                    onFailure = { "บันทึกในเครื่องแล้ว แต่รายงานชุมชนไม่สำเร็จ: ${it.message}" },
+                )
+            }
+            numberDao.upsert(entry.copy(reportedToCommunity = reported, updatedAt = System.currentTimeMillis()))
+            onDone(message)
+        }
+    }
+
+    fun deleteNumber(number: String) {
+        viewModelScope.launch { numberDao.delete(number) }
+    }
+
+    fun exportBook(target: Uri, onDone: (Int) -> Unit) {
+        viewModelScope.launch {
+            val items = numberDao.allBook().map { NumberBookFile.Item(it.number, it.label, it.category, it.note) }
+            val json = Json.encodeToString(NumberBookFile.serializer(), NumberBookFile(entries = items))
+            withContext(Dispatchers.IO) {
+                getApplication<Application>().contentResolver.openOutputStream(target)?.use { it.write(json.toByteArray(Charsets.UTF_8)) }
+            }
+            onDone(items.size)
+        }
+    }
+
+    /** นำเข้าสมุดเบอร์จากครอบครัว: เพิ่มเฉพาะเบอร์ที่ยังไม่มี (ไม่ทับป้ายที่ผู้ใช้ตั้งเอง) */
+    fun importBook(source: Uri, onDone: (String) -> Unit) {
+        viewModelScope.launch {
+            val result = runCatching {
+                val text = withContext(Dispatchers.IO) {
+                    getApplication<Application>().contentResolver.openInputStream(source)?.use { it.readBytes().toString(Charsets.UTF_8) }
+                } ?: error("เปิดไฟล์ไม่ได้")
+                val file = Json { ignoreUnknownKeys = true }.decodeFromString(NumberBookFile.serializer(), text)
+                require(file.format == NumberBookFile.FORMAT) { "ไม่ใช่ไฟล์สมุดเบอร์ของ SAFE" }
+                val labels = CallerCheck.BookLabel.entries.map { it.name }.toSet()
+                val entries = file.entries.mapNotNull { item ->
+                    val n = PhoneNumbers.normalize(item.number) ?: return@mapNotNull null
+                    if (item.label !in labels) return@mapNotNull null
+                    NumberEntry(n, item.label, item.category?.take(40), item.note?.take(200))
+                }
+                numberDao.insertIfAbsent(entries).count { it != -1L }
+            }
+            onDone(result.fold({ "นำเข้า $it เบอร์" }, { "นำเข้าไม่สำเร็จ: ${it.message}" }))
+        }
+    }
+
+    fun setCommunity(on: Boolean) {
+        viewModelScope.launch {
+            if (on) {
+                CommunityReports.enable(getApplication())
+                communityStatus = "กำลังดาวน์โหลดรายชื่อเบอร์จากชุมชน…"
+            } else {
+                CommunityReports.disable(getApplication())
+                communityStatus = ""
+            }
+            communityEnabled = on
+        }
+    }
+
+    fun syncCommunityNow() {
+        viewModelScope.launch {
+            communityStatus = "กำลังซิงก์…"
+            communityStatus = CommunityReports.sync(getApplication()).fold(
+                { "ซิงก์แล้ว อัปเดต $it เบอร์" },
+                { "ซิงก์ไม่สำเร็จ: ${it.message}" },
+            )
+        }
+    }
+
     // ---------------- การตั้งค่า ----------------
     var numberWarning by mutableStateOf(prefs.numberWarningEnabled)
         private set
@@ -177,11 +279,13 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun deleteAllData(onDone: () -> Unit) {
         viewModelScope.launch {
             listener.stop()
-            dao.deleteAll()
+            if (prefs.communityEnabled) CommunityReports.disable(getApplication())
+            withContext(Dispatchers.IO) { SafeDatabase.get(getApplication()).clearAllTables() }
             WorkManager.getInstance(getApplication()).cancelAllWork()
             prefs.clearAll()
             withContext(Dispatchers.IO) { getApplication<Application>().cacheDir.deleteRecursively() }
             hasConsent = false
+            communityEnabled = false
             numberWarning = prefs.numberWarningEnabled
             autoRecording = prefs.autoRecordingCheckEnabled
             live = LiveUi()

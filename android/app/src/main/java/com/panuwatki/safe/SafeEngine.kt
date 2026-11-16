@@ -65,9 +65,11 @@ object SafeEngine {
             ),
         )
 
-    /** ลบผลที่ผู้ใช้ไม่ได้ยืนยันและเก่ากว่า RETENTION_DAYS */
+    /** ลบผลที่ผู้ใช้ไม่ได้ยืนยัน (เก่ากว่า RETENTION_DAYS) และเบอร์สายล่าสุด (เก่ากว่า RECENT_DAYS) */
     suspend fun purgeExpired(context: Context) {
-        val before = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(SafeDatabase.RETENTION_DAYS)
-        SafeDatabase.get(context).analyses().purgeUnlabeledBefore(before)
+        val now = System.currentTimeMillis()
+        val db = SafeDatabase.get(context)
+        db.analyses().purgeUnlabeledBefore(now - TimeUnit.DAYS.toMillis(SafeDatabase.RETENTION_DAYS))
+        db.numbers().purgeRecentBefore(now - TimeUnit.DAYS.toMillis(SafeDatabase.RECENT_DAYS))
     }
 }

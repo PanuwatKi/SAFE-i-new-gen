@@ -36,12 +36,18 @@ fun ConsentScreen(onAccept: () -> Unit, onReadPolicy: () -> Unit) {
         Text("🛡️ SAFE", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Black)
         Text("ผู้ช่วยเตือนมิจฉาชีพทางโทรศัพท์", style = MaterialTheme.typography.titleLarge)
         SectionCard("SAFE ทำอะไรบ้าง") {
-            Text("• เตือนเมื่อมีสายเข้าจากเบอร์ที่มีลักษณะเสี่ยง (เช่น +697, +698)", style = MaterialTheme.typography.bodyLarge)
+            Text("• เตือนเมื่อมีสายเข้าจากเบอร์ที่มีลักษณะเสี่ยง (เช่น +697) หรือเบอร์ที่คุณ/ชุมชนรายงานไว้", style = MaterialTheme.typography.bodyLarge)
             Text("• ตรวจไฟล์อัดเสียงสายหลังวางสาย แล้วเตือนถ้าบทสนทนาเข้าข่ายมิจฉาชีพ", style = MaterialTheme.typography.bodyLarge)
             Text("• ฟังผ่านลำโพงระหว่างคุย (ทดลอง)", style = MaterialTheme.typography.bodyLarge)
         }
         SectionCard("ข้อมูลของคุณ") {
-            Text("• AI วิเคราะห์ในเครื่องนี้เท่านั้น แอป SAFE ไม่มีสิทธิ์ใช้อินเทอร์เน็ต", style = MaterialTheme.typography.bodyLarge)
+            Text("• AI วิเคราะห์บทสนทนาในเครื่องนี้เท่านั้น ข้อความบทสนทนาไม่ถูกส่งออกจากเครื่อง", style = MaterialTheme.typography.bodyLarge)
+            Text("• SAFE จดเบอร์ไม่รู้จักที่โทรเข้าไว้ในเครื่อง 7 วัน เพื่อให้คุณรายงานสายเมื่อกี้ได้ แล้วลบเอง", style = MaterialTheme.typography.bodyLarge)
+            Text(
+                "• ฐานข้อมูลเบอร์ชุมชน (ไม่บังคับ ปิดไว้ก่อน): ถ้าคุณเปิด SAFE จะดาวน์โหลดรายชื่อเบอร์ที่ถูกรายงาน " +
+                    "และเมื่อคุณกดรายงาน จะส่งรหัสเบอร์ (hash) กับประเภทขึ้นคลาวด์ ไม่ส่งชื่อหรือข้อความใด ๆ",
+                style = MaterialTheme.typography.bodyLarge,
+            )
             Text(
                 "• การแปลงเสียงเป็นข้อความใช้บริการถอดเสียงของระบบ Android ในเครื่อง ถ้าเครื่องถอดภาษาไทยในเครื่องไม่ได้ " +
                     "บริการนั้น (เช่น ของ Google) อาจส่งเสียงไปประมวลผลที่เซิร์ฟเวอร์ของผู้ให้บริการ",
@@ -106,6 +112,14 @@ fun HomeScreen(vm: MainViewModel, actions: HomeActions, resumeTick: Int, onNavig
                 style = MaterialTheme.typography.bodyMedium,
             )
             BigButton("เริ่มฟัง", { onNavigate(Screen.Listen) })
+        }
+
+        SectionCard("4) สมุดเบอร์ / รายงานเบอร์") {
+            Text(
+                "บันทึกเบอร์มิจฉาชีพ/สแปม/ไว้ใจได้ รายงานสายเมื่อกี้ แชร์รายชื่อให้ครอบครัว และดูเบอร์ทางการสำหรับโทรกลับตรวจสอบ",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            BigButton("เปิดสมุดเบอร์", { onNavigate(Screen.Numbers) })
         }
 
         BigOutlinedButton("📋 ประวัติ / ช่วยเพิ่มข้อมูลให้ AI", { onNavigate(Screen.History) })

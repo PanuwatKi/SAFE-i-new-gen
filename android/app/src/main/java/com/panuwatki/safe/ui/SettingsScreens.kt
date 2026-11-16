@@ -46,9 +46,10 @@ fun SettingsScreen(
             }
             BigOutlinedButton("เปิดหน้าสิทธิ์ของแอปในระบบ", { openAppSettings(context) })
         }
+        CommunityCard(vm)
         SectionCard("ความเป็นส่วนตัว") {
-            Text("• SAFE ไม่มีสิทธิ์ใช้อินเทอร์เน็ต AI วิเคราะห์ในเครื่องนี้", style = MaterialTheme.typography.bodyMedium)
-            Text("• ไม่เก็บไฟล์เสียง ไม่เก็บเบอร์ของคู่สาย", style = MaterialTheme.typography.bodyMedium)
+            Text("• AI วิเคราะห์บทสนทนาในเครื่องนี้ ข้อความไม่ถูกส่งออก", style = MaterialTheme.typography.bodyMedium)
+            Text("• ไม่เก็บไฟล์เสียง · เบอร์ไม่รู้จักที่โทรเข้าเก็บในเครื่อง 7 วัน", style = MaterialTheme.typography.bodyMedium)
             BigOutlinedButton("อ่านนโยบายความเป็นส่วนตัว", onPrivacy)
             BigOutlinedButton("🗑️ ลบข้อมูลทั้งหมดของ SAFE", { confirmDelete = true })
         }

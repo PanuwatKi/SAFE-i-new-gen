@@ -1,0 +1,13 @@
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+.cxx/
+.externalNativeBuild/
+captures/
+.kotlin/
+# กุญแจเซ็นแอป — ห้ามขึ้น repo เด็ดขาด
+*.jks
+*.keystore
+keystore.properties

@@ -14,3 +14,7 @@ keystore.properties
 
 # ค่า Firebase ของแต่ละคน (ดู docs/FIREBASE_SETUP.md)
 firebase.properties
+
+# กุญแจ debug ที่ใช้ร่วมกัน (รหัส android) — ให้ APK จากทุกเครื่อง/ทุกรอบ CI อัปเดตทับกันได้
+# ใช้กับรุ่น debug เท่านั้น ห้ามใช้เซ็นรุ่นที่ขึ้น Play Store
+!app/debug.keystore

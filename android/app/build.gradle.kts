@@ -34,6 +34,18 @@ android {
         buildConfigField("String", "FIREBASE_API_KEY", fb("apiKey"))
     }
 
+    signingConfigs {
+        // กุญแจ debug ที่ commit ไว้ใน repo -> APK รุ่น debug จากทุกเครื่องและทุกรอบ CI เซ็นด้วยกุญแจเดียวกัน
+        // ผู้ทดสอบจึงติดตั้งรุ่นใหม่ทับรุ่นเก่าได้ ไม่ต้องถอนแอป (ข้อมูลไม่หาย)
+        // ⚠️ ใช้กับ debug เท่านั้น รุ่น release ต้องใช้กุญแจจริงที่ไม่อยู่ใน repo (ดู docs/SECURITY_POLICY.md)
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true

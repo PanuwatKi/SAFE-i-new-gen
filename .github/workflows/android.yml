@@ -21,6 +21,12 @@ concurrency:
 
 jobs:
   build:
+    # 17 = ขั้นต่ำของ AGP · 25 = JDK ที่มากับ Android Studio รุ่นใหม่ (กันปัญหา build ในเครื่องนักพัฒนาไม่ผ่าน)
+    name: build (JDK ${{ matrix.java }})
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ["17", "25"]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     defaults:
@@ -32,7 +38,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: ${{ matrix.java }}
 
       # runner ของ GitHub (ubuntu-latest) มี Android SDK + license ติดตั้งไว้แล้ว (ANDROID_HOME)
       # AGP จะดาวน์โหลด platform ที่ขาดให้เอง
@@ -58,7 +64,7 @@ jobs:
           fi
 
       - name: Upload Room schema
-        if: always()
+        if: always() && matrix.java == '17'
         uses: actions/upload-artifact@v4
         with:
           name: room-schemas
@@ -66,7 +72,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Upload test reports
-        if: always()
+        if: always() && matrix.java == '17'
         uses: actions/upload-artifact@v4
         with:
           name: test-reports
@@ -74,6 +80,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Upload debug APK
+        if: matrix.java == '17'
         uses: actions/upload-artifact@v4
         with:
           name: safe-debug-apk

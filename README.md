@@ -101,6 +101,19 @@ python predict.py          # ลองพิมพ์บทสนทนาทด
 3. ต่อมือถือ (เปิด USB debugging) แล้วกด ▶ Run
 4. รัน unit test: คลิกขวาที่ `app/src/test` → **Run Tests** หรือ `./gradlew testDebugUnitTest`
 
+### 🤖 Build อัตโนมัติบน GitHub (CI)
+ทุกครั้งที่ push จะรันบน GitHub Actions ให้เอง ไม่ต้องมี Android Studio:
+- **Android CI** ([.github/workflows/android.yml](.github/workflows/android.yml)): ตรวจ Gradle wrapper → รัน unit test 22 ข้อ → build APK
+- **ML check** ([.github/workflows/ml.yml](.github/workflows/ml.yml)): เทรนโมเดล + ตรวจว่าไฟล์ที่ส่งให้แอปตรงกับ scikit-learn
+
+**ดาวน์โหลด APK ไปลองบนมือถือ:** GitHub → แท็บ **Actions** → **Android CI** → เลือก run ล่าสุดที่เป็น ✅ → เลื่อนลงไปที่ **Artifacts** → `safe-debug-apk`
+(แตกไฟล์ zip → ส่ง `app-debug.apk` เข้ามือถือ → เปิดติดตั้ง ต้องอนุญาต "ติดตั้งแอปที่ไม่รู้จัก" ครั้งแรก · ไฟล์เก็บไว้ 14 วัน)
+
+หรือใช้คำสั่ง:
+```bash
+gh run download --repo PanuwatKi/SAFE-i-new-gen --name safe-debug-apk
+```
+
 ต้องการ: minSdk 26 (Android 8) · ฟีเจอร์ตรวจไฟล์เสียงต้อง Android 13+ · การเตือนตอนสายเข้าต้อง Android 10+
 
 ### สิ่งที่ต้องทดสอบบนเครื่องจริง

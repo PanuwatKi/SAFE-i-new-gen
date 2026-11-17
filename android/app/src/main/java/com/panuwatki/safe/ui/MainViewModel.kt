@@ -35,6 +35,8 @@ import kotlinx.coroutines.withContext
 
 class MainViewModel(app: Application) : AndroidViewModel(app) {
 
+    private val lenientJson = Json { ignoreUnknownKeys = true }
+
     private val prefs = Prefs(app)
     private val dao = SafeDatabase.get(app).analyses()
 
@@ -216,7 +218,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 val text = withContext(Dispatchers.IO) {
                     getApplication<Application>().contentResolver.openInputStream(source)?.use { it.readBytes().toString(Charsets.UTF_8) }
                 } ?: error("เปิดไฟล์ไม่ได้")
-                val file = Json { ignoreUnknownKeys = true }.decodeFromString(NumberBookFile.serializer(), text)
+                val file = lenientJson.decodeFromString(NumberBookFile.serializer(), text)
                 require(file.format == NumberBookFile.FORMAT) { "ไม่ใช่ไฟล์สมุดเบอร์ของ SAFE" }
                 val labels = CallerCheck.BookLabel.entries.map { it.name }.toSet()
                 val entries = file.entries.mapNotNull { item ->

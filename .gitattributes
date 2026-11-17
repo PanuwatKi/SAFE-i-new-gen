@@ -1,0 +1,4 @@
+# สคริปต์ Gradle ต้องคงรูปแบบบรรทัดให้รันได้ทั้ง Linux (CI) และ Windows
+android/gradlew      text eol=lf
+*.bat                text eol=crlf
+*.jar                binary

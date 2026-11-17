@@ -33,7 +33,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private val dateFormat = SimpleDateFormat("d MMM yy HH:mm", Locale("th", "TH"))
+private val dateFormat = SimpleDateFormat("d MMM yy HH:mm", Locale.forLanguageTag("th-TH"))
 
 @Composable
 fun HistoryScreen(vm: MainViewModel, onBack: () -> Unit, onOpenRecord: (Long) -> Unit) {

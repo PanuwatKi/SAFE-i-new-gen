@@ -44,7 +44,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private val timeFormat = SimpleDateFormat("d MMM HH:mm", Locale("th", "TH"))
+private val timeFormat = SimpleDateFormat("d MMM HH:mm", Locale.forLanguageTag("th-TH"))
 
 private fun labelText(label: String): String = when (label) {
     BookLabel.SCAM.name -> "🔴 มิจฉาชีพ"

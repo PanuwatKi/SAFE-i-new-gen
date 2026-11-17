@@ -130,7 +130,7 @@ class ScamClassifier(private val model: ModelFile) {
         }
 
         fun thaiWords(text: String): List<String> {
-            val it = BreakIterator.getWordInstance(Locale("th", "TH"))
+            val it = BreakIterator.getWordInstance(Locale.forLanguageTag("th-TH"))
             it.setText(text)
             val words = mutableListOf<String>()
             var start = it.first()

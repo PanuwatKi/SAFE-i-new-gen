@@ -40,7 +40,7 @@ fun SettingsScreen(
     ScreenColumn {
         BackRow("ตั้งค่าและความเป็นส่วนตัว", onBack)
         SectionCard("การเตือน") {
-            SwitchRow("เตือนเบอร์อันตรายตอนสายเข้า", vm.numberWarning) { vm.setNumberWarning(it) }
+            SwitchRow("เตือนเบอร์อันตรายตอนสายเข้า", vm.numberWarning) { vm.updateNumberWarning(it) }
             SwitchRow("ตรวจสายอัตโนมัติหลังวางสาย", vm.autoRecording) { on ->
                 if (on) actions.enableAutoRecording() else actions.disableAutoRecording()
             }

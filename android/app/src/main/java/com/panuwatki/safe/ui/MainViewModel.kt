@@ -259,12 +259,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     var autoRecording by mutableStateOf(prefs.autoRecordingCheckEnabled)
         private set
 
-    fun setNumberWarning(on: Boolean) {
+    fun updateNumberWarning(on: Boolean) {
         prefs.numberWarningEnabled = on
         numberWarning = on
     }
 
-    fun setAutoRecording(on: Boolean) {
+    fun updateAutoRecording(on: Boolean) {
         prefs.autoRecordingCheckEnabled = on
         autoRecording = on
         if (on) {

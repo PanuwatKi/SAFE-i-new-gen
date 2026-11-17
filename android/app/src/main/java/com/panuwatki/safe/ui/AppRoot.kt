@@ -71,7 +71,7 @@ fun AppRoot(launchRequest: LaunchRequest?, onLaunchHandled: () -> Unit, vm: Main
     // ---------- ขอสิทธิ์ต่าง ๆ ----------
     val autoPermissions = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
         if (granted[CallRecordings.audioPermission()] == true) {
-            vm.setAutoRecording(true)
+            vm.updateAutoRecording(true)
         } else {
             toast(context, "ต้องอนุญาตให้อ่านไฟล์เสียง SAFE ถึงจะหาไฟล์อัดเสียงสายได้")
         }
@@ -106,7 +106,7 @@ fun AppRoot(launchRequest: LaunchRequest?, onLaunchHandled: () -> Unit, vm: Main
                 }
                 autoPermissions.launch(perms.toTypedArray())
             },
-            disableAutoRecording = { vm.setAutoRecording(false) },
+            disableAutoRecording = { vm.updateAutoRecording(false) },
             pickAudioFile = { pickAudio.launch(arrayOf("audio/*")) },
         )
     }

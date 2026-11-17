@@ -28,6 +28,7 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onPrivacy: () -> Unit,
     onDataDeleted: () -> Unit,
+    onSetup: () -> Unit,
 ) {
     val context = LocalContext.current
     var confirmDelete by remember { mutableStateOf(false) }
@@ -45,6 +46,7 @@ fun SettingsScreen(
                 if (on) actions.enableAutoRecording() else actions.disableAutoRecording()
             }
             BigOutlinedButton("เปิดหน้าสิทธิ์ของแอปในระบบ", { openAppSettings(context) })
+            BigOutlinedButton("🧭 ตั้งค่าทีละขั้นอีกครั้ง", onSetup)
         }
         CommunityCard(vm)
         SectionCard("ความเป็นส่วนตัว") {

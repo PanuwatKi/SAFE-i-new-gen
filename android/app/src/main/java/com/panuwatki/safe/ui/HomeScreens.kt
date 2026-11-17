@@ -78,6 +78,7 @@ fun HomeScreen(vm: MainViewModel, actions: HomeActions, resumeTick: Int, onNavig
     ScreenColumn {
         Text("🛡️ SAFE", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Black)
         Text("ผู้ช่วยเตือนมิจฉาชีพทางโทรศัพท์", style = MaterialTheme.typography.titleMedium)
+        BigOutlinedButton("🧭 ตั้งค่าทีละขั้น (ลูกหลานช่วยตั้งได้)", { onNavigate(Screen.Setup) })
 
         SectionCard("1) เตือนเบอร์อันตรายตอนสายเข้า") {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {

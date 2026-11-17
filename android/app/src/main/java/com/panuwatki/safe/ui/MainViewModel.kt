@@ -50,6 +50,14 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { SafeEngine.purgeExpired(app) }
     }
 
+    var setupCompleted by mutableStateOf(prefs.setupCompleted)
+        private set
+
+    fun completeSetup() {
+        prefs.setupCompleted = true
+        setupCompleted = true
+    }
+
     fun acceptConsent() {
         prefs.consentVersion = Prefs.CURRENT_CONSENT_VERSION
         hasConsent = true
@@ -287,6 +295,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             prefs.clearAll()
             withContext(Dispatchers.IO) { getApplication<Application>().cacheDir.deleteRecursively() }
             hasConsent = false
+            setupCompleted = false
             communityEnabled = false
             numberWarning = prefs.numberWarningEnabled
             autoRecording = prefs.autoRecordingCheckEnabled

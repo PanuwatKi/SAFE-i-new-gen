@@ -38,6 +38,7 @@ sealed interface Screen {
     data object Numbers : Screen
     data class NumberEdit(val number: String?) : Screen
     data object Official : Screen
+    data object Setup : Screen
 }
 
 /** สิ่งที่ MainActivity ส่งเข้ามาจาก Intent (แชร์ไฟล์เสียง / แตะการแจ้งเตือน) */
@@ -57,6 +58,10 @@ fun AppRoot(launchRequest: LaunchRequest?, onLaunchHandled: () -> Unit, vm: Main
     fun go(s: Screen) { stack.add(s) }
     fun back() { if (stack.size > 1) stack.removeAt(stack.lastIndex) }
     BackHandler(enabled = stack.size > 1) { back() }
+
+    LaunchedEffect(vm.hasConsent, vm.setupCompleted) {
+        if (vm.hasConsent && !vm.setupCompleted && stack.lastOrNull() != Screen.Setup) go(Screen.Setup)
+    }
 
     LaunchedEffect(launchRequest, vm.hasConsent) {
         if (launchRequest == null || !vm.hasConsent) return@LaunchedEffect
@@ -132,6 +137,7 @@ fun AppRoot(launchRequest: LaunchRequest?, onLaunchHandled: () -> Unit, vm: Main
                     onBack = ::back,
                     onPrivacy = { go(Screen.Privacy) },
                     onDataDeleted = { stack.clear(); stack.add(Screen.Home) },
+                    onSetup = { go(Screen.Setup) },
                 )
                 Screen.Privacy -> PrivacyScreen(onBack = ::back)
                 Screen.Numbers -> NumbersScreen(
@@ -141,6 +147,7 @@ fun AppRoot(launchRequest: LaunchRequest?, onLaunchHandled: () -> Unit, vm: Main
                 )
                 is Screen.NumberEdit -> NumberEditScreen(vm, s.number, onBack = ::back)
                 Screen.Official -> OfficialNumbersScreen(onBack = ::back)
+                Screen.Setup -> SetupScreen(vm, resumeTick.intValue, onFinish = { vm.completeSetup(); back() })
             }
         }
     }

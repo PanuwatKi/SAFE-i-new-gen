@@ -43,6 +43,10 @@ object CallRecordings {
     fun hasPermission(context: Context): Boolean =
         ContextCompat.checkSelfPermission(context, audioPermission()) == PackageManager.PERMISSION_GRANTED
 
+    /** ใช้ในหน้าตั้งค่า: เช็กว่า SAFE มองเห็นไฟล์อัดเสียงสายของเครื่องนี้ไหม (ย้อนหลังกี่วัน) */
+    fun countRecent(context: Context, days: Int): Int =
+        findNewSince(context, System.currentTimeMillis() - days * 24L * 60 * 60 * 1000).size
+
     fun findNewSince(context: Context, sinceMs: Long): List<Recording> {
         if (!hasPermission(context)) return emptyList()
         val collection = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI

@@ -37,11 +37,17 @@ class Prefs(context: Context) {
         get() = sp.getLong(KEY_COMMUNITY_SYNC, 0L)
         set(v) = sp.edit { putLong(KEY_COMMUNITY_SYNC, v) }
 
+    /** ผ่านหน้าตั้งค่าแบบทีละขั้นแล้ว (กดเสร็จสิ้นหรือข้าม) — ไม่ได้แปลว่าเปิดครบทุกอย่าง */
+    var setupCompleted: Boolean
+        get() = sp.getBoolean(KEY_SETUP, false)
+        set(v) = sp.edit { putBoolean(KEY_SETUP, v) }
+
     fun clearAll() = sp.edit { clear() }
 
     companion object {
         /** v2: เพิ่มการจดเบอร์ไม่รู้จัก 7 วัน + ฐานข้อมูลชุมชน (ไม่บังคับ) */
         const val CURRENT_CONSENT_VERSION = 2
+        private const val KEY_SETUP = "setup_completed"
         private const val KEY_COMMUNITY = "community_enabled"
         private const val KEY_COMMUNITY_SYNC = "community_last_sync"
         private const val KEY_CONSENT = "consent_version"

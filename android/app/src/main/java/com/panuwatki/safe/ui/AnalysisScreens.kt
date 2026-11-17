@@ -76,7 +76,7 @@ fun ListenScreen(vm: MainViewModel, onBack: () -> Unit, onOpenRecord: (Long) -> 
 }
 
 @Composable
-fun AnalyzeScreen(vm: MainViewModel, uri: Uri, onBack: () -> Unit, onOpenRecord: (Long) -> Unit) {
+fun AnalyzeScreen(vm: MainViewModel, uri: Uri, onBack: () -> Unit, onOpenRecord: (Long) -> Unit, onChecklist: () -> Unit) {
     LaunchedEffect(uri) {
         if (vm.fileUi is MainViewModel.FileUi.Idle) vm.analyzeFile(uri)
     }
@@ -109,6 +109,7 @@ fun AnalyzeScreen(vm: MainViewModel, uri: Uri, onBack: () -> Unit, onOpenRecord:
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }
+                    BigButton("🆘 ตอบ 5 ข้อแทน (ไม่ต้องใช้เสียง)", onChecklist)
                 }
             }
         }

@@ -87,6 +87,18 @@ fun HomeScreen(vm: MainViewModel, actions: HomeActions, resumeTick: Int, onNavig
         Text("ผู้ช่วยเตือนมิจฉาชีพทางโทรศัพท์", style = MaterialTheme.typography.titleMedium)
         BigOutlinedButton("🧭 ตั้งค่าทีละขั้น (ลูกหลานช่วยตั้งได้)", { onNavigate(Screen.Setup) })
 
+        SectionCard("🆘 เพิ่งคุยกับสายแปลก ๆ?") {
+            Text("ตอบ 5 ข้อ แค่แตะ ใช่ / ไม่ใช่ รู้ผลทันที ไม่ต้องอัดเสียง", style = MaterialTheme.typography.bodyMedium)
+            BigButton("ตอบ 5 ข้อ", { onNavigate(Screen.Checklist) })
+        }
+        SectionCard("💬 ตรวจข้อความ / ลิงก์") {
+            Text(
+                "ได้ SMS หรือ LINE แปลก ๆ? กดค้างที่ข้อความ → แชร์ → SAFE หรือกดปุ่มด้านล่างแล้ววางข้อความ",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            BigButton("ตรวจข้อความ", { onNavigate(Screen.TextCheck(null)) })
+        }
+
         SectionCard("1) เตือนเบอร์อันตรายตอนสายเข้า") {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                 Text("ต้องใช้ Android 10 ขึ้นไป", style = MaterialTheme.typography.bodyLarge)

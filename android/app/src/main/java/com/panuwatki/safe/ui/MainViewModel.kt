@@ -22,6 +22,8 @@ import com.panuwatki.safe.data.CsvExporter
 import com.panuwatki.safe.data.Prefs
 import com.panuwatki.safe.data.SafeDatabase
 import com.panuwatki.safe.ml.Conversation
+import com.panuwatki.safe.ml.LinkChecker
+import com.panuwatki.safe.ml.Verdict
 import com.panuwatki.safe.ml.ConversationState
 import com.panuwatki.safe.ml.PiiRedactor
 import com.panuwatki.safe.ml.RiskColor
@@ -166,6 +168,50 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             }
             onDone(rows.size)
         }
+    }
+
+    // ---------------- ตรวจข้อความ / ลิงก์ ----------------
+    data class TextCheckUi(
+        val text: String,
+        val verdict: Verdict?,
+        val words: List<String>,
+        val links: List<LinkChecker.Finding>,
+        val color: RiskColor?,
+        val savedId: Long? = null,
+    )
+
+    var textCheck by mutableStateOf<TextCheckUi?>(null)
+        private set
+
+    fun checkText(raw: String) {
+        val text = raw.trim()
+        if (text.isEmpty()) return
+        viewModelScope.launch {
+            val classifier = SafeEngine.classifier(getApplication())
+            val links = LinkChecker.check(text)
+            val verdict = if (Conversation.hasEnoughText(text)) withContext(Dispatchers.Default) { classifier.classify(text) } else null
+            val words = if (verdict != null && verdict.color != RiskColor.GREEN) {
+                withContext(Dispatchers.Default) { classifier.explain(text) }
+            } else emptyList()
+            // สีรวม = สีที่เสี่ยงกว่า ระหว่าง AI กับการตรวจลิงก์
+            val color = listOfNotNull(verdict?.color, LinkChecker.colorOf(links)).maxOrNull()
+            textCheck = TextCheckUi(text, verdict, words, links, color)
+        }
+    }
+
+    /** บันทึกลงประวัติ (ลบข้อมูลส่วนตัวก่อน) เพื่อให้ผู้ใช้ยืนยันและส่งออกเป็นข้อมูลเทรนได้ */
+    fun saveTextCheck() {
+        val t = textCheck ?: return
+        val color = t.color ?: return
+        viewModelScope.launch {
+            val state = ConversationState(t.text, t.verdict, t.verdict?.percent ?: 0.0, color, enoughData = true)
+            val id = SafeEngine.save(getApplication(), state, AnalysisEntity.SOURCE_TEXT)
+            textCheck = t.copy(savedId = id)
+        }
+    }
+
+    fun clearTextCheck() {
+        textCheck = null
     }
 
     // ---------------- สมุดเบอร์ / สายล่าสุด / ชุมชน ----------------

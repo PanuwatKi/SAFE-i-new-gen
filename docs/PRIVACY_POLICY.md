@@ -24,6 +24,8 @@ SAFE เป็นแอปช่วยเตือนภัยมิจฉาช
 | ข้อความบทสนทนาที่ถอดได้ | วิเคราะห์ความเสี่ยง และให้คุณยืนยันผล | เก็บในเครื่อง หลังลบเบอร์โทร เลขบัญชี เลขบัตรประชาชน รหัส OTP ลิงก์ และอีเมลออกแล้ว |
 | เบอร์ที่โทรเข้า (เฉพาะเบอร์ที่ไม่อยู่ในรายชื่อติดต่อ) | ตรวจความเสี่ยงตอนสายเข้า และให้คุณกดรายงานสายเมื่อกี้ได้ | เก็บในเครื่อง **7 วัน** แล้วลบอัตโนมัติ |
 | สมุดเบอร์ (เบอร์ ป้าย ประเภท โน้ต ที่คุณบันทึกเอง) | เตือน/ตัดสายตามที่คุณตั้ง | เก็บในเครื่องจนกว่าคุณจะลบ |
+| ข้อความที่คุณแชร์ วาง หรือพิมพ์มาให้ตรวจ (เช่น SMS, LINE) และลิงก์ในข้อความ | วิเคราะห์ความเสี่ยงในเครื่อง (SAFE ไม่เปิดลิงก์) | **ไม่เก็บ** เว้นแต่คุณกด "บันทึก" (ลบข้อมูลส่วนตัวออกก่อน) |
+| คำตอบแบบถามตอบ 5 ข้อหลังวางสาย | ประเมินความเสี่ยง | **ไม่เก็บ** |
 
 SAFE **ไม่** เข้าถึงรายชื่อติดต่อ ประวัติการโทร ข้อความ SMS ตำแหน่ง หรือบัญชีใดๆ ของคุณ และไม่มีการลงทะเบียนหรือเข้าสู่ระบบ
 
@@ -81,6 +83,8 @@ SAFE helps protect people from phone scams by (1) warning about risky or reporte
 | Transcribed conversation text | Risk analysis; lets you confirm the result | On device only, after phone numbers, account numbers, national ID numbers, OTP codes, links and emails are removed |
 | Incoming caller number (only numbers not in your contacts) | Ring-time check; lets you report the last call | On device for **7 days**, then deleted automatically |
 | Number book (numbers, labels, categories, notes you save) | Warn/reject calls as you choose | On device until you delete it |
+| Text you share, paste or type for checking (e.g. SMS, LINE) and links in it | On-device risk analysis (SAFE never opens the links) | **Not stored** unless you tap "Save" (personal data removed first) |
+| Answers to the 5-question post-call checklist | Risk assessment | **Not stored** |
 
 SAFE does **not** access your contacts, call log, SMS, location or any accounts. There is no sign-up or login.
 

@@ -39,6 +39,9 @@ class MainActivity : ComponentActivity() {
     /** แปลง Intent ที่เปิดแอป: แชร์ไฟล์เสียงเข้ามา / แตะการแจ้งเตือน */
     private fun parse(intent: Intent?): LaunchRequest? {
         intent ?: return null
+        if (intent.action == Intent.ACTION_SEND && intent.type?.startsWith("text/") == true) {
+            intent.getStringExtra(Intent.EXTRA_TEXT)?.takeIf { it.isNotBlank() }?.let { return LaunchRequest.CheckText(it) }
+        }
         if (intent.action == Intent.ACTION_SEND) {
             IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java)?.let {
                 return LaunchRequest.AnalyzeUri(it)

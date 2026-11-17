@@ -74,7 +74,11 @@ private fun HistoryItem(e: AnalysisEntity, onClick: () -> Unit) {
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )
-            val source = if (e.source == AnalysisEntity.SOURCE_LIVE) "ฟังสด" else "ไฟล์อัดเสียง"
+            val source = when (e.source) {
+                AnalysisEntity.SOURCE_LIVE -> "ฟังสด"
+                AnalysisEntity.SOURCE_TEXT -> "ข้อความ"
+                else -> "ไฟล์อัดเสียง"
+            }
             Text("${dateFormat.format(Date(e.createdAt))} · $source", style = MaterialTheme.typography.bodyMedium)
             val labelText = when (e.userLabel) {
                 AnalysisEntity.LABEL_SCAM -> "✔ ยืนยันแล้ว: มิจฉาชีพ" + (e.category?.let { " ($it)" } ?: "")

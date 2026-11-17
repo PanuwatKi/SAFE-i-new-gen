@@ -39,6 +39,8 @@ sealed interface Screen {
     data class NumberEdit(val number: String?) : Screen
     data object Official : Screen
     data object Setup : Screen
+    data class TextCheck(val initialText: String?) : Screen
+    data object Checklist : Screen
 }
 
 /** สิ่งที่ MainActivity ส่งเข้ามาจาก Intent (แชร์ไฟล์เสียง / แตะการแจ้งเตือน) */
@@ -46,6 +48,7 @@ sealed interface LaunchRequest {
     data class AnalyzeUri(val uri: Uri) : LaunchRequest
     data class OpenRecord(val id: Long) : LaunchRequest
     data class ReportNumber(val number: String) : LaunchRequest
+    data class CheckText(val text: String) : LaunchRequest
 }
 
 @Composable
@@ -69,6 +72,7 @@ fun AppRoot(launchRequest: LaunchRequest?, onLaunchHandled: () -> Unit, vm: Main
             is LaunchRequest.AnalyzeUri -> { vm.resetFile(); go(Screen.Analyze(launchRequest.uri)) }
             is LaunchRequest.OpenRecord -> go(Screen.Record(launchRequest.id))
             is LaunchRequest.ReportNumber -> go(Screen.NumberEdit(launchRequest.number))
+            is LaunchRequest.CheckText -> go(Screen.TextCheck(launchRequest.text))
         }
         onLaunchHandled()
     }
@@ -129,7 +133,11 @@ fun AppRoot(launchRequest: LaunchRequest?, onLaunchHandled: () -> Unit, vm: Main
             when (val s = stack.last()) {
                 Screen.Home -> HomeScreen(vm, actions, resumeTick.intValue, onNavigate = ::go)
                 Screen.Listen -> ListenScreen(vm, onBack = ::back, onOpenRecord = { go(Screen.Record(it)) })
-                is Screen.Analyze -> AnalyzeScreen(vm, s.uri, onBack = ::back, onOpenRecord = { go(Screen.Record(it)) })
+                is Screen.Analyze -> AnalyzeScreen(
+                    vm, s.uri, onBack = ::back,
+                    onOpenRecord = { go(Screen.Record(it)) },
+                    onChecklist = { go(Screen.Checklist) },
+                )
                 Screen.History -> HistoryScreen(vm, onBack = ::back, onOpenRecord = { go(Screen.Record(it)) })
                 is Screen.Record -> RecordScreen(vm, s.id, onBack = ::back)
                 Screen.Settings -> SettingsScreen(
@@ -147,6 +155,8 @@ fun AppRoot(launchRequest: LaunchRequest?, onLaunchHandled: () -> Unit, vm: Main
                 )
                 is Screen.NumberEdit -> NumberEditScreen(vm, s.number, onBack = ::back)
                 Screen.Official -> OfficialNumbersScreen(onBack = ::back)
+                is Screen.TextCheck -> TextCheckScreen(vm, s.initialText, onBack = ::back, onOpenRecord = { go(Screen.Record(it)) })
+                Screen.Checklist -> ChecklistScreen(onBack = ::back, onReportNumber = { go(Screen.Numbers) })
                 Screen.Setup -> SetupScreen(vm, resumeTick.intValue, onFinish = { vm.completeSetup(); back() })
             }
         }

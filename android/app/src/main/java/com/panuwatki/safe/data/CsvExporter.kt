@@ -17,7 +17,7 @@ object CsvExporter {
             append(quote(r.transcript)).append(',')
             append(label).append(',')
             append(quote(r.category ?: "")).append(',')
-            append("call").append("\r\n")
+            append(if (r.source == AnalysisEntity.SOURCE_TEXT) "chat" else "call").append("\r\n")
         }
     }
 

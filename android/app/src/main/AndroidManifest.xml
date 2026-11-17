@@ -55,6 +55,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="audio/*" />
             </intent-filter>
+            <!-- ผู้ใช้แชร์ข้อความ SMS / LINE เข้ามาให้ตรวจ -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
         </activity>
 
         <!-- เตือนเบอร์อันตรายตอนสายเข้า (ผู้ใช้ต้องตั้ง SAFE เป็นแอปคัดกรองสายเอง) -->

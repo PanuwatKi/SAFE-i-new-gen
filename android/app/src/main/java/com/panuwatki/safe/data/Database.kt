@@ -33,6 +33,7 @@ data class AnalysisEntity(
     companion object {
         const val SOURCE_LIVE = "live"
         const val SOURCE_RECORDING = "recording"
+        const val SOURCE_TEXT = "text"
         const val LABEL_NORMAL = 0
         const val LABEL_SCAM = 1
     }

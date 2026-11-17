@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.panuwatki.safe.calls.CallRecordings
 import com.panuwatki.safe.notify.Alerts
+import com.panuwatki.safe.setup.SetupGuide
 import com.panuwatki.safe.speech.FileTranscriber
 
 @Composable
@@ -74,6 +75,12 @@ fun HomeScreen(vm: MainViewModel, actions: HomeActions, resumeTick: Int, onNavig
     val canNotify = remember(resumeTick) { Alerts.canNotify(context) }
     val canReadAudio = remember(resumeTick) { CallRecordings.hasPermission(context) }
     val fileSupported = remember { FileTranscriber.isSupported(context) }
+    val brand = remember {
+        SetupGuide.detect(
+            android.os.Build.MANUFACTURER ?: "",
+            runCatching { context.getSystemService(android.telecom.TelecomManager::class.java)?.defaultDialerPackage }.getOrNull(),
+        )
+    }
 
     ScreenColumn {
         Text("🛡️ SAFE", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Black)
@@ -87,7 +94,10 @@ fun HomeScreen(vm: MainViewModel, actions: HomeActions, resumeTick: Int, onNavig
                 StatusLine(roleHeld, if (roleHeld) "ตั้ง SAFE เป็นแอปคัดกรองสายแล้ว" else "ยังไม่ได้ตั้ง SAFE เป็นแอปคัดกรองสาย")
                 StatusLine(canNotify, if (canNotify) "แจ้งเตือนได้" else "ยังไม่อนุญาตการแจ้งเตือน")
                 if (!roleHeld || !canNotify) BigButton("เปิดใช้การเตือนตอนสายเข้า", actions.requestCallScreening)
-                Text("SAFE ไม่บล็อกสาย และไม่บันทึกเบอร์ แค่เตือนให้ระวัง", style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    "SAFE ไม่ตัดสายเอง (ยกเว้นเบอร์ที่คุณตั้ง \"ตัดสายอัตโนมัติ\") และจดเบอร์ไม่รู้จักไว้ในเครื่อง 7 วันเพื่อให้รายงานได้",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
             }
         }
 
@@ -98,6 +108,12 @@ fun HomeScreen(vm: MainViewModel, actions: HomeActions, resumeTick: Int, onNavig
                 "ต้องเปิด \"อัดเสียงการโทรอัตโนมัติ\" ในแอปโทรศัพท์ของเครื่องก่อน (Samsung, OPPO, Xiaomi, vivo หลายรุ่นทำได้)",
                 style = MaterialTheme.typography.bodyMedium,
             )
+            if (!SetupGuide.supportsAutoRecordingCheck(brand)) {
+                Text(
+                    "⚠️ เครื่องนี้ใช้แอปโทรศัพท์ของ Google ซึ่ง SAFE อ่านไฟล์อัดเสียงไม่ได้ การตรวจอัตโนมัติจึงใช้ไม่ได้ (ยังเลือกไฟล์เสียงมาตรวจเองได้)",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
             if (!fileSupported) {
                 Text("⚠️ การถอดเสียงจากไฟล์ต้องใช้ Android 13 ขึ้นไป", style = MaterialTheme.typography.bodyMedium)
             }

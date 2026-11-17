@@ -110,12 +110,16 @@ object FileTranscriber {
                             }
                         }
                     })
-                    val intent = Recognizers.baseIntent().apply {
+                    val intent = Recognizers.baseIntent(preferOffline = preferOnDevice).apply {
                         putExtra(RecognizerIntent.EXTRA_AUDIO_SOURCE, pfd)
                         putExtra(RecognizerIntent.EXTRA_AUDIO_SOURCE_ENCODING, AudioFormat.ENCODING_PCM_16BIT)
                         putExtra(RecognizerIntent.EXTRA_AUDIO_SOURCE_CHANNEL_COUNT, 1)
                         putExtra(RecognizerIntent.EXTRA_AUDIO_SOURCE_SAMPLING_RATE, AudioDecoder.TARGET_RATE)
-                        putExtra(RecognizerIntent.EXTRA_SEGMENTED_SESSION, RecognizerIntent.EXTRA_AUDIO_SOURCE)
+                        // segmented session ของ Google ใช้ตัวถอดในเครื่อง (SODA) ซึ่งยังไม่รองรับภาษาไทย
+                        // รอบสำรองจึงไม่ใช้ segmented session (ได้ผลถึงช่วงเงียบแรก — ยังดีกว่าไม่ได้เลย)
+                        if (preferOnDevice) {
+                            putExtra(RecognizerIntent.EXTRA_SEGMENTED_SESSION, RecognizerIntent.EXTRA_AUDIO_SOURCE)
+                        }
                     }
                     recognizer.startListening(intent)
                 }

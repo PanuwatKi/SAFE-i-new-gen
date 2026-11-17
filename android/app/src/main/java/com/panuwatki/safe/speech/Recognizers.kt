@@ -22,10 +22,15 @@ object Recognizers {
             SpeechRecognizer.createSpeechRecognizer(context)
         }
 
-    fun baseIntent(): Intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+    /**
+     * @param preferOffline true = ขอให้ถอดในเครื่อง (เป็นส่วนตัวที่สุด)
+     *   ⚠️ ทดสอบบน emulator (Android 17, Google app): ตัวถอดเสียงในเครื่องของ Google (SODA) ยังไม่รองรับภาษาไทย
+     *   ("does not support locale: th-TH") จึงต้องมีรอบสำรองที่ไม่บังคับออฟไลน์
+     */
+    fun baseIntent(preferOffline: Boolean = true): Intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
         putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
         putExtra(RecognizerIntent.EXTRA_LANGUAGE, LANGUAGE)
-        putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
+        putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, preferOffline)
         putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
     }
 

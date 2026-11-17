@@ -53,7 +53,7 @@ class LiveListener(
             recognizer?.destroy()
             recognizer = Recognizers.create(context, preferOnDevice).also {
                 it.setRecognitionListener(listener)
-                it.startListening(Recognizers.baseIntent().apply {
+                it.startListening(Recognizers.baseIntent(preferOffline = preferOnDevice).apply {
                     putExtra(android.speech.RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
                 })
             }

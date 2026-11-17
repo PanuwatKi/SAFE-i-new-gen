@@ -101,7 +101,7 @@ python predict.py          # ลองพิมพ์บทสนทนาทด
 
 ## 📱 Build แอป
 
-1. ติดตั้ง [Android Studio](https://developer.android.com/studio) (มี JDK และ Android SDK มาในตัว)
+1. ติดตั้ง [Android Studio](https://developer.android.com/studio) (มี JDK และ Android SDK มาในตัว) — ใช้ JDK ที่มากับ Android Studio ได้เลย (ทดสอบแล้วทั้ง JDK 17 และ 25)
 2. **File → Open** แล้วเลือกโฟลเดอร์ `android/` รอ Gradle sync
 3. ต่อมือถือ (เปิด USB debugging) แล้วกด ▶ Run
 4. รัน unit test: คลิกขวาที่ `app/src/test` → **Run Tests** หรือ `./gradlew testDebugUnitTest`
@@ -113,6 +113,7 @@ python predict.py          # ลองพิมพ์บทสนทนาทด
 
 **ดาวน์โหลด APK ไปลองบนมือถือ:** GitHub → แท็บ **Actions** → **Android CI** → เลือก run ล่าสุดที่เป็น ✅ → เลื่อนลงไปที่ **Artifacts** → `safe-debug-apk`
 (แตกไฟล์ zip → ส่ง `app-debug.apk` เข้ามือถือ → เปิดติดตั้ง ต้องอนุญาต "ติดตั้งแอปที่ไม่รู้จัก" ครั้งแรก · ไฟล์เก็บไว้ 14 วัน)
+APK debug ทุกรุ่น (จาก CI หรือ build เอง) เซ็นด้วยกุญแจทดสอบเดียวกัน ([android/app/debug.keystore](android/app/debug.keystore)) จึง**ติดตั้งรุ่นใหม่ทับรุ่นเก่าได้เลย ข้อมูลไม่หาย**
 
 หรือใช้คำสั่ง:
 ```bash

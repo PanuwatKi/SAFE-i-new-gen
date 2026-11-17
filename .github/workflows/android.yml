@@ -48,6 +48,14 @@ jobs:
       - name: Build debug APK
         run: ./gradlew assembleDebug --stacktrace
 
+      - name: Upload Room schema
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: room-schemas
+          path: android/app/schemas/
+          if-no-files-found: ignore
+
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4

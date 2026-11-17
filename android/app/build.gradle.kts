@@ -15,6 +15,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 android {
@@ -51,6 +52,11 @@ android {
         compose = true
         buildConfig = true
     }
+}
+
+// เก็บโครงสร้างฐานข้อมูลทุกเวอร์ชันไว้ใน repo -> ใช้ทำ AutoMigration และตรวจใน CI
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 kotlin {

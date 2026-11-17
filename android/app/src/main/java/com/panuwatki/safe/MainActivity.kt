@@ -19,10 +19,17 @@ class MainActivity : ComponentActivity() {
 
     private var launchRequest by mutableStateOf<LaunchRequest?>(null)
 
+    /** Intent ล่าสุดที่จัดการไปแล้ว — กันเปิดหน้าซ้ำตอนหมุนจอ แต่ไม่ทิ้ง Intent ใหม่ */
+    private var handledIntentKey: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        if (savedInstanceState == null) launchRequest = parse(intent)
+        // ตรวจ Intent ทุกครั้ง แม้ Android จะฟื้นหน้าจอจาก savedInstanceState (เช่น แอปถูกปิดเบื้องหลัง
+        // แล้วผู้ใช้แชร์ข้อความจาก LINE เข้ามา) — ข้ามเฉพาะ Intent เดิมที่เคยจัดการแล้ว (หมุนจอ)
+        val alreadyHandled = savedInstanceState?.getInt(KEY_HANDLED_INTENT) == intentKey(intent)
+        if (!alreadyHandled) launchRequest = parse(intent)
+        handledIntentKey = intentKey(intent)
         setContent {
             SafeTheme {
                 AppRoot(launchRequest = launchRequest, onLaunchHandled = { launchRequest = null })
@@ -33,7 +40,29 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        handledIntentKey = intentKey(intent)
         parse(intent)?.let { launchRequest = it }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(KEY_HANDLED_INTENT, handledIntentKey)
+    }
+
+    private fun intentKey(i: Intent?): Int {
+        i ?: return 0
+        return listOf(
+            i.action, i.type, i.dataString,
+            i.getStringExtra(Intent.EXTRA_TEXT),
+            IntentCompat.getParcelableExtra(i, Intent.EXTRA_STREAM, Uri::class.java)?.toString(),
+            i.getStringExtra(Alerts.EXTRA_ANALYZE_URI),
+            i.getStringExtra(Alerts.EXTRA_REPORT_NUMBER),
+            i.getLongExtra(Alerts.EXTRA_OPEN_RECORD_ID, -1L),
+        ).hashCode()
+    }
+
+    private companion object {
+        const val KEY_HANDLED_INTENT = "handled_intent_key"
     }
 
     /** แปลง Intent ที่เปิดแอป: แชร์ไฟล์เสียงเข้ามา / แตะการแจ้งเตือน */

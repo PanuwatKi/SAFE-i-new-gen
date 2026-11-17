@@ -141,7 +141,7 @@ fun ChecklistScreen(onBack: () -> Unit, onReportNumber: () -> Unit) {
 
         if (showResult) {
             val r = ScamChecklist.evaluate(answers.toMap())
-            RiskPanel(r.color, null, r.title)
+            RiskPanel(r.color, null, r.title.takeIf { it != RiskColors.title(r.color) })
             SectionCard("เหตุผล") { r.reasons.forEach { Text("• $it", style = MaterialTheme.typography.bodyLarge) } }
             SafetyAdvice(r.color)
             BigOutlinedButton("📒 รายงานเบอร์ที่โทรมา", onReportNumber)

@@ -34,7 +34,8 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - uses: android-actions/setup-android@v3
+      # runner ของ GitHub (ubuntu-latest) มี Android SDK + license ติดตั้งไว้แล้ว (ANDROID_HOME)
+      # AGP จะดาวน์โหลด platform ที่ขาดให้เอง
 
       - uses: gradle/actions/setup-gradle@v4
         with:

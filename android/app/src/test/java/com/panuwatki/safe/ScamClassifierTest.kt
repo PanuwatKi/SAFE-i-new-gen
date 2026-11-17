@@ -45,7 +45,8 @@ class ScamClassifierTest {
     fun normalizeMatchesPython() {
         assertEquals("คุณ", ScamClassifier.normalize("คุณคุณคุณ"))
         assertEquals("otp", ScamClassifier.normalize("OTP"))
-        assertEquals("ไป ไป", ScamClassifier.normalize("ไปๆ ไป"))
+        // ๆ กลายเป็นช่องว่าง จึงได้ 2 ช่อง (Python: normalize_text("ไปๆ ไป") == "ไป  ไป")
+        assertEquals("ไป  ไป", ScamClassifier.normalize("ไปๆ ไป"))
     }
 
     @Test

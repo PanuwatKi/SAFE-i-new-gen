@@ -121,6 +121,7 @@ SAFE ใช้ `SpeechRecognizer` ของ Android (ส่วนใหญ่ค
   - [ ] ข้อมูลใหม่ที่บันทึก อยู่ในตารางข้อ 2 พร้อมระยะเวลาเก็บ
   - [ ] แก้ `firebase/firestore.rules` แล้วทดสอบใน Rules Playground / Emulator ก่อน publish
   - [ ] unit test ผ่าน
+  - [ ] ถ้าแก้ Entity ของ Room: เพิ่ม version + migration และ commit `android/app/schemas/` (ห้ามล้างข้อมูลผู้ใช้)
 - **ไลบรารี**: เฉพาะ Google Maven / Maven Central · อัปเดตทุก 3 เดือน · ห้าม SDK โฆษณา/analytics
 - **โมเดล AI**: `scam_model.json` สร้างจาก `ml/export_model.py` เท่านั้น (ตรวจความตรงกับ scikit-learn ทุกครั้ง)
 
@@ -146,5 +147,5 @@ SAFE ใช้ `SpeechRecognizer` ของ Android (ส่วนใหญ่ค
 | มิจฉาชีพปลอมเบอร์ที่ดูปกติ | ตรวจเนื้อหาด้วย AI หลังวางสาย แล้วเตือนว่า "เบอร์อาจถูกปลอม" ถ้าเนื้อหาเสี่ยงแต่เบอร์ดูปกติ |
 | `PiiRedactor` ลบชื่อคนไม่ได้ | ผู้ใช้ตรวจก่อนยืนยัน + ทีมตรวจซ้ำก่อนเทรน |
 | ฐานข้อมูลในเครื่องไม่เข้ารหัสแยก | อาศัย FBE + sandbox ของ Android · พิจารณา SQLCipher ภายหลัง |
-| ยังใช้ destructive migration ของ Room | ต้องเขียน Migration จริงก่อนเปิดตัวบน Play |
+| อัปเดตแอปแล้วข้อมูลผู้ใช้หาย | ไม่ใช้ destructive migration (ยกเว้น v1 ที่ไม่เคยปล่อย) · schema ทุกเวอร์ชันอยู่ใน repo · CI fail ถ้าโครงสร้างเปลี่ยนแต่ไม่ commit schema · ขาด migration = แอป crash แทนการลบข้อมูลเงียบ ๆ |
 | ข้อมูลรายงานเก่าไม่หมดอายุอัตโนมัติ (แพ็กฟรี) | ผู้ดูแลลบตามรอบในข้อ 5 |

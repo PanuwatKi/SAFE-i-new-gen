@@ -2,3 +2,6 @@
 android/gradlew      text eol=lf
 *.bat                text eol=crlf
 *.jar                binary
+
+# ไฟล์ schema ของ Room เป็น JSON ที่ Room สร้าง ให้คง LF เพื่อเทียบใน CI ได้ตรง
+android/app/schemas/** text eol=lf

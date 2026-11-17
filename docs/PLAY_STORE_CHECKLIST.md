@@ -7,7 +7,7 @@
 - [ ] ไอคอน 512×512, ภาพหน้าจอ ≥ 2 รูป, feature graphic 1024×500
 - [ ] ทดสอบบนเครื่องจริงอย่างน้อย Samsung + OPPO/Xiaomi (ฟีเจอร์ตรวจไฟล์อัดเสียงสายขึ้นกับยี่ห้อ)
 - [ ] ถ้าเปิดฐานข้อมูลชุมชน: ทำตาม [FIREBASE_SETUP.md](FIREBASE_SETUP.md) และ **Enforce App Check** ก่อนเปิดตัว
-- [ ] เปลี่ยน `fallbackToDestructiveMigration` ของ Room เป็น Migration จริง (ไม่งั้นอัปเดตแอปแล้วข้อมูลผู้ใช้หาย)
+- [x] ~~เปลี่ยน `fallbackToDestructiveMigration` ของ Room เป็น Migration จริง~~ — ทำแล้ว (schema ถูกเก็บใน `android/app/schemas/` และ CI ตรวจทุกครั้ง)
 
 ## 2. คำตอบแบบฟอร์ม Data safety (ร่าง — ฉบับที่ 2 มีฐานข้อมูลชุมชน)
 
@@ -45,5 +45,6 @@
 - [ ] `./gradlew testDebugUnitTest` ผ่าน (รวม `ScamClassifierTest` ที่ยืนยันว่าโมเดลตรงกับ Python)
 - [ ] ถ้าเทรนโมเดลใหม่: รัน `python ml/train_model.py` แล้ว commit ทั้ง `scam_model.json` และ `model_test_vectors.json`
 - [ ] เพิ่ม `versionCode` ใน `android/app/build.gradle.kts`
+- [ ] ถ้าเปลี่ยนโครงสร้างฐานข้อมูล: เพิ่ม `version` + `AutoMigration` ใน `Database.kt` และ commit ไฟล์ schema ใหม่ (CI จะ fail ถ้าลืม)
 - [ ] ถ้าแก้นโยบายสาระสำคัญ: เพิ่ม `Prefs.CURRENT_CONSENT_VERSION` และอัปเดตทั้ง `docs/PRIVACY_POLICY.md` และ `assets/privacy_policy_th.txt`
 - [ ] Google Play กำหนดให้แอปใหม่ต้อง target Android รุ่นล่าสุดภายในกรอบเวลา — ตรวจ `targetSdk` ทุกครั้งก่อนส่ง

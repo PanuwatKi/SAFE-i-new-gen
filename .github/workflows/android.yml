@@ -48,6 +48,15 @@ jobs:
       - name: Build debug APK
         run: ./gradlew assembleDebug --stacktrace
 
+      # ถ้าแก้ Entity แล้วไม่ได้ commit ไฟล์ schema ใหม่ = อาจลืมเขียน migration -> ให้ fail
+      - name: Check Room schema is committed
+        run: |
+          if [ -n "$(git status --porcelain -- app/schemas)" ]; then
+            echo "::error::โครงสร้างฐานข้อมูลเปลี่ยน แต่ยังไม่ได้ commit ไฟล์ใน android/app/schemas/ (ดาวน์โหลดจาก artifact room-schemas) และอย่าลืมเพิ่ม version + migration ใน Database.kt"
+            git status --porcelain -- app/schemas
+            exit 1
+          fi
+
       - name: Upload Room schema
         if: always()
         uses: actions/upload-artifact@v4

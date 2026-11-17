@@ -114,6 +114,13 @@ python predict.py          # ลองพิมพ์บทสนทนาทด
 gh run download --repo PanuwatKi/SAFE-i-new-gen --name safe-debug-apk
 ```
 
+### 🗄️ เปลี่ยนโครงสร้างฐานข้อมูล (Room)
+ข้อมูลผู้ใช้ (สมุดเบอร์, ประวัติ) ต้องไม่หายเมื่ออัปเดตแอป:
+1. แก้ Entity → เพิ่ม `version` ใน `@Database` ขึ้น 1
+2. เพิ่ม `AutoMigration(from = เดิม, to = ใหม่)` (หรือ `Migration` ที่เขียนเองใน `MIGRATIONS` ถ้าเปลี่ยนชื่อ/ลบคอลัมน์)
+3. push → CI สร้างไฟล์ schema ใหม่ → ดาวน์โหลด artifact `room-schemas` แล้ว commit ลง `android/app/schemas/`
+   (ถ้ามี Android Studio: build ในเครื่องแล้ว commit ไฟล์ที่เกิดขึ้นได้เลย) — CI จะ fail ถ้าลืมข้อนี้
+
 ต้องการ: minSdk 26 (Android 8) · ฟีเจอร์ตรวจไฟล์เสียงต้อง Android 13+ · การเตือนตอนสายเข้าต้อง Android 10+
 
 ### สิ่งที่ต้องทดสอบบนเครื่องจริง

@@ -1,0 +1,489 @@
+<meta charset="utf-8">
+<title>SAFE เตือนภัยมิจฉาชีพ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one column of large, high-contrast controls for older users; the app's three-light signal is the result display */
+:root {
+  --bg: #f4f6f9;
+  --surface: #ffffff;
+  --ink: #141b26;
+  --muted: #546072;
+  --line: #d9e0e9;
+  --brand: #1565c0;
+  --brand-ink: #ffffff;
+  --brand-soft: #e2ecf8;
+  --red: #c62828;
+  --red-soft: #fbe5e5;
+  --yellow: #f2b200;
+  --yellow-ink: #3a2c00;
+  --yellow-soft: #fdf3d4;
+  --green: #2e7d32;
+  --green-soft: #e3f1e4;
+  --phone: #10161f;
+  --font-display: "Chakra Petch", "IBM Plex Sans Thai Looped", "Noto Sans Thai", sans-serif;
+  --font-body: "IBM Plex Sans Thai Looped", "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e131a; --surface: #161d27; --ink: #e9eef5; --muted: #9ba7b7; --line: #283343;
+    --brand: #82b4ee; --brand-ink: #0b1420; --brand-soft: #1a2a40;
+    --red: #ef7b7b; --red-soft: #351b1b; --yellow: #f2c64b; --yellow-ink: #2a2000; --yellow-soft: #33290f;
+    --green: #78c77e; --green-soft: #18291a; --phone: #05080c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e131a; --surface: #161d27; --ink: #e9eef5; --muted: #9ba7b7; --line: #283343;
+  --brand: #82b4ee; --brand-ink: #0b1420; --brand-soft: #1a2a40;
+  --red: #ef7b7b; --red-soft: #351b1b; --yellow: #f2c64b; --yellow-ink: #2a2000; --yellow-soft: #33290f;
+  --green: #78c77e; --green-soft: #18291a; --phone: #05080c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body);
+  font-size: 18px; line-height: 1.65;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 56px;
+}
+main { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+h1, h2 { font-family: var(--font-display); line-height: 1.2; margin: 0; text-wrap: balance; }
+h3 { margin: 0; font-size: 1.1rem; line-height: 1.35; }
+p { margin: 0; }
+button, textarea, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+
+/* header */
+.top { display: flex; align-items: center; gap: 14px; }
+.signal { display: flex; flex-direction: column; gap: 4px; padding: 6px 5px; background: var(--phone); border-radius: 9px; flex: none; }
+.signal i { width: 12px; height: 12px; border-radius: 50%; display: block; background: #444; }
+.signal[data-c="RED"] i:nth-child(1) { background: #ff4d4d; box-shadow: 0 0 9px #ff4d4d; }
+.signal[data-c="YELLOW"] i:nth-child(2) { background: #ffcc33; box-shadow: 0 0 9px #ffcc33; }
+.signal[data-c="GREEN"] i:nth-child(3) { background: #4cd964; box-shadow: 0 0 9px #4cd964; }
+.top h1 { font-size: 2rem; letter-spacing: 0.02em; }
+.top p { color: var(--muted); font-size: 0.98rem; }
+
+/* tabs */
+nav.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+nav.tabs a {
+  text-decoration: none; color: var(--ink); background: var(--surface); border: 2px solid var(--line);
+  border-radius: 14px; padding: 10px 8px; text-align: center; font-weight: 600; font-size: 1rem; line-height: 1.3;
+  min-height: 64px; display: grid; place-items: center;
+}
+nav.tabs a[aria-current="page"] { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+
+.panel { display: flex; flex-direction: column; gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.muted { color: var(--muted); font-size: 0.95rem; }
+textarea, input[type="tel"] {
+  width: 100%; border: 2px solid var(--line); border-radius: 12px; background: var(--bg); padding: 12px 14px; font-size: 1.05rem;
+}
+textarea { min-height: 150px; resize: vertical; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn {
+  min-height: 56px; padding: 10px 18px; border-radius: 14px; border: 2px solid var(--brand);
+  background: var(--brand); color: var(--brand-ink); font-weight: 700; font-size: 1.05rem; flex: 1 1 180px;
+}
+.btn.ghost { background: transparent; color: var(--brand); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 6px 14px; font-size: 0.92rem; }
+
+/* result */
+.result { border-radius: 18px; padding: 20px; text-align: center; display: flex; flex-direction: column; gap: 4px; }
+.result.RED { background: var(--red); color: #fff; }
+.result.YELLOW { background: var(--yellow); color: var(--yellow-ink); }
+.result.GREEN { background: var(--green); color: #fff; }
+.result.NONE { background: var(--line); color: var(--ink); }
+.result .big { font-family: var(--font-display); font-size: 1.7rem; font-weight: 700; }
+.result .pct { font-family: var(--font-display); font-size: 3.2rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.findings { display: flex; flex-direction: column; gap: 10px; }
+.finding { border-left: 5px solid var(--line); padding: 4px 0 4px 12px; }
+.finding.HIGH { border-color: var(--red); }
+.finding.CAUTION { border-color: var(--yellow); }
+.finding b { word-break: break-all; }
+ul.advice { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 4px; }
+
+/* quiz */
+.q { display: flex; flex-direction: column; gap: 10px; }
+.yn { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.yn button { min-height: 56px; border-radius: 14px; border: 2px solid var(--line); background: var(--surface); font-weight: 700; font-size: 1.05rem; }
+.yn button[aria-pressed="true"].yes { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+.yn button[aria-pressed="true"].no { background: var(--green-soft); border-color: var(--green); color: var(--green); }
+
+/* demo phone */
+.demo-grid { display: grid; grid-template-columns: minmax(0, 330px) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 680px) { .demo-grid { grid-template-columns: minmax(0, 1fr); } }
+.phone { background: var(--phone); border-radius: 36px; padding: 14px; color: #f2f5f9; box-shadow: 0 10px 30px rgba(0,0,0,0.25); max-width: 340px; width: 100%; margin: 0 auto; }
+.screen { background: #1a2230; border-radius: 26px; min-height: 560px; padding: 16px 14px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+.statusbar { display: flex; justify-content: space-between; font-size: 0.78rem; color: #a9b4c4; }
+.caller { text-align: center; padding: 10px 0 4px; }
+.caller .num { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 0.03em; }
+.caller .lbl { color: #a9b4c4; font-size: 0.85rem; }
+.overlay { border-radius: 14px; padding: 10px 12px; font-size: 0.88rem; line-height: 1.45; }
+.overlay.HIGH { background: #c62828; color: #fff; }
+.overlay.CAUTION { background: #f2b200; color: #2a2000; }
+.overlay.NONE { background: #263244; color: #c9d3e0; }
+.meter { display: flex; align-items: center; gap: 10px; background: #0f151e; border-radius: 14px; padding: 8px 10px; }
+.meter .signal { padding: 5px 4px; background: #000; }
+.meter .txt { font-size: 0.9rem; line-height: 1.35; }
+.meter .txt b { font-family: var(--font-display); font-size: 1.15rem; display: block; }
+.bubbles { display: flex; flex-direction: column; gap: 8px; flex: 1; overflow-y: auto; max-height: 300px; padding-right: 2px; }
+.bubble { background: #2a3546; border-radius: 14px 14px 14px 4px; padding: 8px 11px; font-size: 0.92rem; line-height: 1.45; max-width: 92%; }
+.callbtns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; }
+.callbtns span { text-align: center; border-radius: 999px; padding: 9px 0; font-weight: 700; font-size: 0.92rem; }
+.callbtns .dec { background: #c62828; }
+.callbtns .acc { background: #2e7d32; }
+.alertcard { background: #fff; color: #141b26; border-radius: 16px; padding: 12px; font-size: 0.9rem; line-height: 1.45; }
+.alertcard b { color: #c62828; }
+.scenarios { display: flex; flex-direction: column; gap: 10px; }
+.scenario { text-align: left; border: 2px solid var(--line); background: var(--surface); border-radius: 14px; padding: 12px 14px; }
+.scenario[aria-pressed="true"] { border-color: var(--brand); background: var(--brand-soft); }
+.scenario b { display: block; }
+.scenario span { color: var(--muted); font-size: 0.9rem; }
+
+.hotlines { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.hotline { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: var(--surface); }
+.hotline b { font-family: var(--font-display); font-size: 1.4rem; display: block; user-select: all; }
+.hotline span { color: var(--muted); font-size: 0.85rem; }
+footer { color: var(--muted); font-size: 0.88rem; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--line); padding-top: 16px; }
+.loading { text-align: center; color: var(--muted); padding: 24px 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .bubble { animation: pop 260ms ease-out both; }
+  @keyframes pop { from { opacity: 0; transform: translateY(6px); } }
+}
+</style>
+
+<main>
+  <header class="top">
+    <div class="signal" id="logoSignal" data-c="GREEN" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div>
+      <h1>SAFE</h1>
+      <p>ผู้ช่วยเตือนภัยมิจฉาชีพ · ใช้ได้ทันทีบนเบราว์เซอร์ ไม่ต้องติดตั้ง</p>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="เลือกเครื่องมือ">
+    <a href="#check" data-tab="check">ตรวจข้อความ<br>และเบอร์</a>
+    <a href="#quiz" data-tab="quiz">ตอบ 5 ข้อ<br>หลังวางสาย</a>
+    <a href="#demo" data-tab="demo">ดูเดโม<br>สายเข้า</a>
+  </nav>
+
+  <p class="loading" id="loading">กำลังโหลด AI… (ครั้งแรกประมาณ 1.4 MB)</p>
+
+  <!-- ตรวจข้อความ -->
+  <section class="panel" id="tab-check" hidden>
+    <div class="card">
+      <h2>ตรวจข้อความ SMS / LINE</h2>
+      <p class="muted">คัดลอกข้อความแปลก ๆ มาวางในช่องนี้ (กดค้างในช่อง แล้วเลือก "วาง") หรือพิมพ์เล่าว่าคนที่โทรมาพูดอะไร</p>
+      <label for="msg" class="muted">ข้อความที่ได้รับ</label>
+      <textarea id="msg" placeholder="วางหรือพิมพ์ข้อความที่นี่…"></textarea>
+      <div class="chips" aria-label="ตัวอย่างข้อความ">
+        <button class="chip" type="button" data-sample="0">ตัวอย่าง: คืนภาษี</button>
+        <button class="chip" type="button" data-sample="1">ตัวอย่าง: พัสดุตกค้าง</button>
+        <button class="chip" type="button" data-sample="2">ตัวอย่าง: ข้อความปกติ</button>
+      </div>
+      <div class="row">
+        <button class="btn" id="checkBtn" type="button">ตรวจข้อความ</button>
+        <button class="btn ghost" id="clearBtn" type="button">ล้าง</button>
+      </div>
+    </div>
+    <div id="checkOut" class="panel" aria-live="polite"></div>
+
+    <div class="card">
+      <h2>ตรวจเบอร์ที่โทรมา</h2>
+      <p class="muted">ใส่เบอร์ตามที่ขึ้นบนจอ เช่น +697 123 456 789</p>
+      <label for="num" class="muted">เบอร์โทร</label>
+      <input id="num" type="tel" inputmode="tel" autocomplete="off" placeholder="+66 81 234 5678">
+      <button class="btn" id="numBtn" type="button">ตรวจเบอร์</button>
+      <div id="numOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ตอบ 5 ข้อ -->
+  <section class="panel" id="tab-quiz" hidden>
+    <div class="card">
+      <h2>เพิ่งคุยกับสายแปลก ๆ?</h2>
+      <p class="muted">นึกถึงสายที่เพิ่งคุย แล้วแตะ ใช่ หรือ ไม่ใช่ (ไม่แน่ใจ ข้ามได้)</p>
+    </div>
+    <div id="quizList" class="panel"></div>
+    <button class="btn" id="quizBtn" type="button" disabled>ดูผล</button>
+    <div id="quizOut" class="panel" aria-live="polite"></div>
+  </section>
+
+  <!-- เดโม -->
+  <section class="panel" id="tab-demo" hidden>
+    <div class="card">
+      <h2>เดโม: SAFE ทำงานอย่างไรตอนมีสายเข้า</h2>
+      <p class="muted">จำลองบนหน้าจอเท่านั้น ไม่มีการโทรจริง · สีและเปอร์เซ็นต์คำนวณจาก AI ตัวเดียวกับในแอปจริง ทีละประโยค</p>
+    </div>
+    <div class="demo-grid">
+      <div class="phone" aria-label="หน้าจอโทรศัพท์จำลอง">
+        <div class="screen" id="screen">
+          <div class="statusbar"><span>09:41</span><span>SAFE เปิดอยู่</span></div>
+          <div class="caller"><div class="lbl" id="callState">เลือกสถานการณ์แล้วกดเริ่ม</div><div class="num" id="callNum">—</div></div>
+          <div id="overlay"></div>
+          <div class="meter" id="meter" hidden>
+            <div class="signal" id="meterSignal" data-c="" aria-hidden="true"><i></i><i></i><i></i></div>
+            <div class="txt" id="meterTxt"></div>
+          </div>
+          <div class="bubbles" id="bubbles" aria-live="polite"></div>
+          <div id="alertSlot"></div>
+          <div class="callbtns" id="callBtns" hidden><span class="dec">ปฏิเสธ</span><span class="acc">รับสาย</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="scenarios" id="scenarios" role="group" aria-label="สถานการณ์"></div>
+        <div class="row">
+          <button class="btn" id="demoPlay" type="button">เริ่มเดโม</button>
+          <button class="btn ghost" id="demoStep" type="button">ทีละประโยค</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="hl">
+    <h2 id="hl">เบอร์แจ้งเหตุ</h2>
+    <div class="hotlines">
+      <div class="hotline"><b>1441</b><span>ศูนย์ AOC ภัยออนไลน์ 24 ชม.</span></div>
+      <div class="hotline"><b>1213</b><span>ธนาคารแห่งประเทศไทย</span></div>
+      <div class="hotline"><b>191</b><span>เหตุด่วนเหตุร้าย</span></div>
+    </div>
+    <p class="muted">แจ้งความออนไลน์: thaipoliceonline.com</p>
+  </section>
+
+  <footer>
+    <p><b>ความเป็นส่วนตัว:</b> ข้อความและเบอร์ที่คุณใส่ ประมวลผลในเบราว์เซอร์ของคุณเท่านั้น ไม่ถูกส่งไปที่ใด และไม่ถูกบันทึก</p>
+    <p>AI อาจผิดพลาดได้ ใช้เป็นเครื่องช่วยเตือน ไม่ใช่คำตัดสิน หลักจำง่าย: ไม่เชื่อ ไม่รีบ ไม่โอน</p>
+  </footer>
+</main>
+
+<script src="safe-core.js"></script>
+<script>
+(function () {
+  "use strict";
+  var clf = null;
+  var $ = function (id) { return document.getElementById(id); };
+  var LABEL = { RED: "เสี่ยงมิจฉาชีพสูงมาก", YELLOW: "น่าสงสัย ระวังไว้", GREEN: "ปลอดภัย" };
+  var ADVICE = [
+    "ห้ามโอนเงิน ห้ามบอกรหัส OTP หรือรหัสผ่าน",
+    "ห้ามกดลิงก์หรือติดตั้งแอปตามที่อีกฝ่ายบอก",
+    "วางสาย แล้วโทรกลับเบอร์ทางการของหน่วยงานเอง",
+    "ปรึกษาลูกหลาน หรือโทรสายด่วน 1441",
+  ];
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function resultHtml(color, percent, sub) {
+    return '<div class="result ' + color + '"><div class="big">' + esc(LABEL[color] || "") + "</div>" +
+      (percent != null ? '<div class="pct">' + Math.round(percent) + "%</div>" : "") +
+      (sub ? "<div>" + esc(sub) + "</div>" : "") + "</div>";
+  }
+  function adviceHtml(color) {
+    if (color === "GREEN") return "";
+    return '<div class="card"><h3>ควรทำอย่างไร</h3><ul class="advice">' + ADVICE.map(function (a) { return "<li>" + esc(a) + "</li>"; }).join("") + "</ul></div>";
+  }
+
+  // ---------- แท็บ (#check / #quiz / #demo) ----------
+  var TABS = ["check", "quiz", "demo"];
+  function showTab() {
+    var name = (location.hash || "").replace("#", "");
+    if (TABS.indexOf(name) < 0) name = "check";
+    TABS.forEach(function (t) {
+      $("tab-" + t).hidden = !clf || t !== name;
+      var a = document.querySelector('nav.tabs a[data-tab="' + t + '"]');
+      if (t === name) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+    });
+  }
+  window.addEventListener("hashchange", showTab);
+
+  // ---------- ตรวจข้อความ ----------
+  var SAMPLES = [
+    "กรมสรรพากรแจ้ง คุณได้รับเงินคืนภาษี 8,500 บาท กรุณายืนยันตัวตนภายในวันนี้ที่ https://rd-refund.top/th และติดตั้งแอปที่ https://bit.ly/3xTax",
+    "ไปรษณีย์ไทย: พัสดุของท่านตกค้างเนื่องจากที่อยู่ไม่ครบ กรุณาชำระค่าธรรมเนียม 25 บาทที่ http://thaipost-delivery.xyz/pay ภายใน 24 ชม. มิฉะนั้นพัสดุจะถูกตีกลับ",
+    "แม่จ๋า เย็นนี้หนูกลับบ้านช้าหน่อยนะ ติดประชุม ไม่ต้องรอกินข้าว",
+  ];
+  document.querySelectorAll("[data-sample]").forEach(function (b) {
+    b.addEventListener("click", function () { $("msg").value = SAMPLES[+b.dataset.sample]; runCheck(); });
+  });
+  $("clearBtn").addEventListener("click", function () { $("msg").value = ""; $("checkOut").innerHTML = ""; setLogo("GREEN"); });
+  $("checkBtn").addEventListener("click", runCheck);
+  function setLogo(c) { $("logoSignal").dataset.c = c || "GREEN"; }
+  function runCheck() {
+    var text = $("msg").value.trim();
+    if (!text || !clf) return;
+    var links = SAFE.links.check(text);
+    var verdict = SAFE.hasEnoughText(text) ? clf.classify(text) : null;
+    var color = SAFE.maxColor(verdict && verdict.color, SAFE.links.colorOf(links));
+    var html = "";
+    if (!color) {
+      html += resultHtml("NONE", null, "ข้อความสั้นเกินไป พิมพ์หรือวางข้อความให้ยาวกว่านี้");
+    } else {
+      html += resultHtml(color, verdict ? verdict.percent : null, verdict ? null : "ตัดสินจากลิงก์ในข้อความ");
+    }
+    if (links.length) {
+      html += '<div class="card"><h3>ลิงก์ในข้อความ (' + links.length + ')</h3><div class="findings">' +
+        links.map(function (f) { return '<div class="finding ' + f.level + '"><b>' + esc(f.host) + "</b><br>" + esc(f.reason) + "</div>"; }).join("") +
+        '</div><p class="muted">SAFE ไม่ได้เปิดลิงก์ ตรวจจากชื่อลิงก์อย่างเดียว</p></div>';
+    }
+    if (verdict && verdict.color !== "GREEN") {
+      var words = clf.explain(text);
+      if (words.length) html += '<div class="card"><h3>คำที่ทำให้สงสัย</h3><p>' + words.map(esc).join(" · ") + "</p></div>";
+    }
+    if (color) html += adviceHtml(color);
+    $("checkOut").innerHTML = html;
+    setLogo(color);
+  }
+  $("numBtn").addEventListener("click", function () {
+    var raw = $("num").value;
+    if (!raw.trim()) { $("numOut").innerHTML = ""; return; }
+    var r = SAFE.numbers.assess(raw);
+    var map = { HIGH: "RED", CAUTION: "YELLOW", NONE: "GREEN" };
+    var sub = r.reason || "ไม่พบลักษณะเสี่ยงจากรูปแบบเบอร์ (ยังต้องฟังเนื้อหาที่พูดด้วย มิจฉาชีพปลอมเบอร์ได้)";
+    $("numOut").innerHTML = resultHtml(map[r.level], null, sub);
+  });
+
+  // ---------- ตอบ 5 ข้อ ----------
+  var answers = {};
+  function renderQuiz() {
+    $("quizList").innerHTML = SAFE.checklist.questions.map(function (q, i) {
+      return '<div class="card q"><h3>' + (i + 1) + ". " + esc(q.text) + '</h3><p class="muted">' + esc(q.hint) + '</p>' +
+        '<div class="yn"><button type="button" class="yes" data-q="' + q.id + '" data-a="1" aria-pressed="' + (answers[q.id] === true) + '">ใช่</button>' +
+        '<button type="button" class="no" data-q="' + q.id + '" data-a="0" aria-pressed="' + (answers[q.id] === false) + '">ไม่ใช่</button></div></div>';
+    }).join("");
+    $("quizBtn").disabled = Object.keys(answers).length === 0;
+  }
+  $("quizList").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-q]");
+    if (!b) return;
+    answers[b.dataset.q] = b.dataset.a === "1";
+    $("quizOut").innerHTML = "";
+    renderQuiz();
+  });
+  $("quizBtn").addEventListener("click", function () {
+    var r = SAFE.checklist.evaluate(answers);
+    $("quizOut").innerHTML = resultHtml(r.color, null, r.title !== LABEL[r.color] ? r.title : null) +
+      '<div class="card"><h3>เหตุผล</h3><ul class="advice">' + r.reasons.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>" +
+      adviceHtml(r.color);
+    setLogo(r.color);
+  });
+
+  // ---------- เดโมสายเข้า ----------
+  var SCENARIOS = [
+    { title: "แก๊งอ้างเป็นตำรวจ", desc: "โทรจาก +697 ขู่ว่าบัญชีพัวพันคดี แล้วให้โอนเงิน", number: "+697 812 345 678", lines: [
+      "สวัสดีครับ ติดต่อจากสถานีตำรวจนครบาลนะครับ",
+      "ขอสอบถามว่าคุณคือเจ้าของบัญชีธนาคารที่ลงท้ายด้วย 4521 ใช่ไหมครับ",
+      "ตอนนี้บัญชีของคุณถูกใช้รับเงินจากขบวนการฟอกเงินและยาเสพติด",
+      "เรื่องนี้เป็นความลับทางคดี ห้ามบอกครอบครัวนะครับ ห้ามวางสาย",
+      "เพื่อพิสูจน์ความบริสุทธิ์ ต้องโอนเงินทั้งหมดไปบัญชีปลอดภัยของสำนักงานภายในหนึ่งชั่วโมง",
+    ] },
+    { title: "เบอร์ดูปกติ แต่เนื้อหาเป็นมิจฉาชีพ", desc: "เบอร์มือถือไทยธรรมดา อ้างเป็นบริษัทขนส่ง (เบอร์อาจถูกปลอม)", number: "081 234 5678", lines: [
+      "สวัสดีค่ะ ติดต่อจากบริษัทขนส่งนะคะ",
+      "พัสดุของคุณถูกตรวจพบสิ่งผิดกฎหมายที่ศุลกากรค่ะ",
+      "ตอนนี้เจ้าหน้าที่อายัดไว้แล้ว ดิฉันจะโอนสายให้ตำรวจนะคะ",
+      "ถ้าไม่เกี่ยวข้อง ต้องโอนเงินค่าตรวจสอบและติดตั้งแอปเพื่อยืนยันตัวตนค่ะ",
+    ] },
+    { title: "ธนาคารโทรมาจริง", desc: "ยืนยันรายการผิดปกติ โดยไม่ขอรหัสหรือให้โอนเงิน", number: "02 123 4567", lines: [
+      "สวัสดีครับ ทางธนาคารขอยืนยันรายการซื้อของออนไลน์สามพันสองร้อยบาทเมื่อสักครู่",
+      "ถ้าคุณเป็นคนทำรายการเอง ไม่ต้องทำอะไรเพิ่มครับ",
+      "ถ้าไม่ใช่ ผมจะระงับบัตรให้ก่อน แล้วให้คุณไปออกบัตรใหม่ที่สาขา",
+      "ธนาคารจะไม่ขอรหัสผ่านหรือรหัส OTP ทุกกรณีนะครับ ขอบคุณครับ",
+    ] },
+  ];
+  var scenarioIdx = 0, step = -1, timer = null, conv = null;
+  function renderScenarios() {
+    $("scenarios").innerHTML = SCENARIOS.map(function (s, i) {
+      return '<button type="button" class="scenario" data-s="' + i + '" aria-pressed="' + (i === scenarioIdx) + '"><b>' + esc(s.title) + "</b><span>" + esc(s.desc) + "</span></button>";
+    }).join("");
+  }
+  $("scenarios").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-s]");
+    if (!b) return;
+    scenarioIdx = +b.dataset.s;
+    renderScenarios();
+    resetDemo();
+  });
+  function resetDemo() {
+    clearInterval(timer); timer = null; step = -1; conv = SAFE.createConversation(clf);
+    $("callState").textContent = "เลือกสถานการณ์แล้วกดเริ่ม";
+    $("callNum").textContent = "—";
+    $("overlay").innerHTML = ""; $("bubbles").innerHTML = ""; $("alertSlot").innerHTML = "";
+    $("meter").hidden = true; $("callBtns").hidden = true;
+    $("demoPlay").textContent = "เริ่มเดโม";
+  }
+  function ring() {
+    var s = SCENARIOS[scenarioIdx];
+    var r = SAFE.numbers.assess(s.number);
+    $("callState").textContent = "สายเรียกเข้า…";
+    $("callNum").textContent = s.number;
+    $("callBtns").hidden = false;
+    var msg = r.level === "NONE" ? "SAFE: ไม่พบลักษณะเสี่ยงจากเบอร์ จะฟังเนื้อหาต่อเมื่อรับสาย" : "SAFE: " + r.reason;
+    $("overlay").innerHTML = '<div class="overlay ' + r.level + '">' + esc(msg) + "</div>";
+  }
+  function nextLine() {
+    var s = SCENARIOS[scenarioIdx];
+    if (step === -1) { ring(); step = 0; return true; }
+    if (step === 0) { $("callBtns").hidden = true; $("callState").textContent = "กำลังคุย (เปิดลำโพง)"; $("meter").hidden = false; }
+    if (step >= s.lines.length) { finish(); return false; }
+    var line = s.lines[step];
+    var b = document.createElement("div"); b.className = "bubble"; b.textContent = line;
+    $("bubbles").appendChild(b); $("bubbles").scrollTop = $("bubbles").scrollHeight;
+    var st = conv.add(line);
+    var color = st.enoughData ? st.peakColor : null;
+    $("meterSignal").dataset.c = color || "";
+    $("meterTxt").innerHTML = st.enoughData
+      ? "<b>" + esc(LABEL[color]) + " " + Math.round(st.peak) + "%</b>ล่าสุด " + Math.round(st.latest.percent) + "% · สูงสุดในสายนี้ " + Math.round(st.peak) + "%"
+      : "<b>ฟังอยู่…</b>ยังไม่พอจะตัดสิน";
+    step++;
+    if (step >= s.lines.length) { finish(); return false; }
+    return true;
+  }
+  function finish() {
+    clearInterval(timer); timer = null;
+    var s = SCENARIOS[scenarioIdx];
+    var st = conv.add("");
+    $("callState").textContent = "วางสายแล้ว";
+    var numberLooked = SAFE.numbers.assess(s.number).level === "NONE";
+    var html;
+    if (st.peakColor === "RED") {
+      html = '<div class="alertcard"><b>SAFE: สายเมื่อกี้เสี่ยงมิจฉาชีพสูงมาก (' + Math.round(st.peak) + "%)</b><br>ห้ามโอนเงิน ห้ามบอกรหัส OTP ห้ามกดลิงก์" +
+        (numberLooked ? "<br>แม้เบอร์จะดูปกติ แต่เนื้อหาเข้าข่ายมิจฉาชีพ เบอร์ที่โชว์อาจถูกปลอม" : "") + "<br>แตะเพื่อรายงานเบอร์นี้</div>";
+    } else if (st.peakColor === "YELLOW") {
+      html = '<div class="alertcard"><b>SAFE: สายเมื่อกี้น่าสงสัย (' + Math.round(st.peak) + "%)</b><br>ถ้าไม่แน่ใจ วางสายแล้วโทรกลับเบอร์ทางการเอง</div>";
+    } else {
+      html = '<div class="alertcard"><b style="color:#2e7d32">SAFE: ไม่พบสัญญาณมิจฉาชีพในสายนี้</b><br>ถ้ามีอะไรแปลก ๆ ภายหลัง ตอบ 5 ข้อได้ทุกเมื่อ</div>';
+    }
+    $("alertSlot").innerHTML = html;
+    $("demoPlay").textContent = "เล่นใหม่";
+  }
+  $("demoPlay").addEventListener("click", function () {
+    if (timer) { clearInterval(timer); timer = null; $("demoPlay").textContent = "เล่นต่อ"; return; }
+    if (step === -1 || $("demoPlay").textContent === "เล่นใหม่") { resetDemo(); }
+    $("demoPlay").textContent = "หยุดชั่วคราว";
+    if (step === -1) nextLine();
+    timer = setInterval(function () { if (!nextLine()) { clearInterval(timer); timer = null; } }, 2300);
+  });
+  $("demoStep").addEventListener("click", function () {
+    if (timer) { clearInterval(timer); timer = null; }
+    if ($("demoPlay").textContent === "เล่นใหม่") resetDemo();
+    nextLine();
+    if (step >= 0 && $("demoPlay").textContent !== "เล่นใหม่") $("demoPlay").textContent = "เล่นต่อ";
+  });
+
+  // ---------- โหลดโมเดล ----------
+  fetch("scam_model.json")
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (model) {
+      clf = SAFE.createClassifier(model);
+      $("loading").hidden = true;
+      renderQuiz(); renderScenarios(); resetDemo(); showTab();
+    })
+    .catch(function () {
+      $("loading").textContent = "โหลด AI ไม่สำเร็จ ลองรีเฟรชหน้านี้อีกครั้ง";
+    });
+})();
+</script>

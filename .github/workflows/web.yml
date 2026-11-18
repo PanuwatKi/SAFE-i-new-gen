@@ -1,0 +1,25 @@
+# ตรวจ "สมองฉบับ JavaScript" (เว็บแอป + บอต LINE) ว่าให้ผลตรงกับ Python และ Android
+name: Web & LINE bot
+
+on:
+  push:
+    branches: [main]
+    paths: ["web/**", "line-bot/**", "android/app/src/main/assets/scam_model.json", "android/app/src/test/resources/**", ".github/workflows/web.yml"]
+  pull_request:
+    paths: ["web/**", "line-bot/**", "android/app/src/main/assets/scam_model.json", "android/app/src/test/resources/**", ".github/workflows/web.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: JS core + LINE bot tests
+        run: node --test web/test/core.test.js line-bot/test/bot.test.js

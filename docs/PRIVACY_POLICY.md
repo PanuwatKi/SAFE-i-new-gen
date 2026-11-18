@@ -68,6 +68,15 @@ SAFE **ไม่** เข้าถึงรายชื่อติดต่อ 
 ### 9. การเปลี่ยนแปลงนโยบาย
 หากมีการเปลี่ยนแปลงสาระสำคัญ แอปจะแสดงนโยบายใหม่และขอความยินยอมจากคุณอีกครั้ง
 
+### 10. บริการอื่นของ SAFE: เว็บไซต์ และบอต LINE
+**เว็บไซต์ SAFE** — ข้อความและเบอร์ที่คุณใส่ ประมวลผลในเบราว์เซอร์ของคุณเท่านั้น ไม่ถูกส่งไปที่ใดและไม่ถูกบันทึก
+
+**บอต LINE ของ SAFE**
+- ข้อความที่คุณส่งให้บอต ถูกส่งผ่าน LINE ไปประมวลผลที่ Google Apps Script ของทีมพัฒนา แล้วตอบกลับ (LINE และ Google ประมวลผลตามนโยบายของตนเอง)
+- ข้อความล่าสุดพักไว้ชั่วคราวไม่เกิน 10 นาที เพื่อรอว่าคุณจะกดยินยอมให้เก็บหรือไม่ แล้วหมดอายุเอง
+- **เก็บเฉพาะเมื่อคุณกด "ใช่ มิจฉาชีพ" หรือ "ไม่ใช่มิจฉาชีพ"** โดยลบเบอร์โทร เลขบัญชี เลขบัตร รหัส ลิงก์ และอีเมลออกก่อน **ไม่เก็บ ID หรือชื่อ LINE ของคุณ** เก็บใน Google Sheet ของทีมพัฒนาเพื่อใช้พัฒนา AI และลบภายใน 90 วันหลังรวมเข้าชุดข้อมูล
+- เพราะไม่เก็บ ID ของคุณ เราจึงระบุไม่ได้ว่าข้อความไหนเป็นของคุณ หากต้องการให้ลบ ให้แจ้งเนื้อหาข้อความทางอีเมลด้านบน
+
 ---
 
 ## English
@@ -126,3 +135,12 @@ You may request access, correction, deletion, objection or withdrawal of consent
 
 ### 9. Changes
 If we make material changes, the app will show the new policy and ask for your consent again.
+
+### 10. Other SAFE services: website and LINE bot
+**SAFE website** — text and numbers you enter are processed in your browser only; nothing is sent anywhere or stored.
+
+**SAFE LINE bot**
+- Messages you send to the bot travel through LINE to the developers' Google Apps Script for analysis and a reply (LINE and Google process them under their own policies).
+- Your latest message is held temporarily for up to 10 minutes while the bot waits for your consent choice, then expires.
+- **It is stored only if you tap "Yes, scam" or "Not a scam"**, after phone numbers, account numbers, ID numbers, codes, links and emails are removed. **Your LINE ID and name are not stored.** Stored text goes to the developers' Google Sheet to improve the AI and is deleted within 90 days of being merged into the dataset.
+- Because your ID is not stored, we cannot tell which text is yours; to request deletion, email us the message content.

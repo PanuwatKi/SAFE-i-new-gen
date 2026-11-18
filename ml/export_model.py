@@ -20,6 +20,7 @@ import json
 import math
 import os
 import re
+import shutil
 import sys
 from datetime import datetime, timezone
 
@@ -38,6 +39,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR = os.path.join(HERE, "model")
 ANDROID_APP = os.path.join(HERE, "..", "android", "app", "src")
 ASSET_PATH = os.path.join(ANDROID_APP, "main", "assets", "scam_model.json")
+# เว็บแอปและบอต LINE ใช้ไฟล์เดียวกัน (ทดสอบว่าตรงกันใน web/test/core.test.js)
+WEB_MODEL_PATH = os.path.join(HERE, "..", "web", "scam_model.json")
 TEST_VECTOR_PATH = os.path.join(ANDROID_APP, "test", "resources", "model_test_vectors.json")
 
 # ประโยคเพิ่มเติมสำหรับทดสอบ (นอกเหนือจากข้อมูลเทรน) ครอบคลุมกรณีขอบ
@@ -134,8 +137,9 @@ def main():
     os.makedirs(os.path.dirname(ASSET_PATH), exist_ok=True)
     with open(ASSET_PATH, "w", encoding="utf-8") as fp:
         json.dump(exported, fp, ensure_ascii=False, separators=(",", ":"))
+    shutil.copyfile(ASSET_PATH, WEB_MODEL_PATH)
     print(f"✅ ส่งออก {os.path.normpath(ASSET_PATH)} "
-          f"({len(terms)} ฟีเจอร์, {os.path.getsize(ASSET_PATH) / 1e6:.1f} MB)")
+          f"+ web/scam_model.json ({len(terms)} ฟีเจอร์, {os.path.getsize(ASSET_PATH) / 1e6:.1f} MB)")
 
     # test vector: ตัวอย่างทุก ๆ 7 ประโยค + กรณีขอบทั้งหมด
     sample = texts[:-len(EXTRA_TEST_TEXTS)][::7] + EXTRA_TEST_TEXTS

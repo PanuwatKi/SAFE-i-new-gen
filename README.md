@@ -154,6 +154,11 @@ gh run download --repo PanuwatKi/SAFE-i-new-gen --name safe-debug-apk
 - ผลที่ไม่ยืนยันลบเองใน 30 วัน · ปุ่มลบข้อมูลทั้งหมด
 - รายละเอียด: [docs/SECURITY_POLICY.md](docs/SECURITY_POLICY.md) · [docs/PRIVACY_POLICY.md](docs/PRIVACY_POLICY.md)
 
+## 🏆 ผลทดสอบและการแข่งขัน
+- ทดสอบละเอียด + สร้างกราฟ: `cd ml && python evaluate.py` → [`docs/report/`](docs/report/) (กราฟ 6 รูป + `metrics.json`)
+- ความแม่นยำ 95.3% (5-fold CV) · จับมิจฉาชีพได้มากกว่าการตรวจคำต้องห้าม 30 จุด · ทนถอดเสียงผิด 20% (93.4%)
+- เตรียมแข่ง I-New Gen Award รอบระดับประเทศ: [docs/COMPETITION_GUIDE.md](docs/COMPETITION_GUIDE.md)
+
 ## 🗺️ แผนถัดไป
 - ฝังตัวถอดเสียงออฟไลน์ (whisper.cpp) แทนบริการถอดเสียงของระบบ → ออฟไลน์ 100% จริง และถอดไฟล์ได้ทุกเครื่อง
 - เวอร์ชัน iOS (เตือนเบอร์ผ่าน CallKit + กรอง SMS) — iOS ไม่อนุญาตให้ฟังเสียงระหว่างสาย

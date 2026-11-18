@@ -118,7 +118,7 @@ python predict.py          # ลองพิมพ์บทสนทนาทด
 
 ### 🤖 Build อัตโนมัติบน GitHub (CI)
 ทุกครั้งที่ push จะรันบน GitHub Actions ให้เอง ไม่ต้องมี Android Studio:
-- **Android CI** ([.github/workflows/android.yml](.github/workflows/android.yml)): ตรวจ Gradle wrapper → รัน unit test ทั้งหมด (25 ข้อ) → build APK
+- **Android CI** ([.github/workflows/android.yml](.github/workflows/android.yml)): ตรวจ Gradle wrapper → รัน unit test ทั้งหมด (35 ข้อ) → build APK
 - **ML check** ([.github/workflows/ml.yml](.github/workflows/ml.yml)): เทรนโมเดล + ตรวจว่าไฟล์ที่ส่งให้แอปตรงกับ scikit-learn
 
 **ดาวน์โหลด APK ไปลองบนมือถือ:** GitHub → แท็บ **Actions** → **Android CI** → เลือก run ล่าสุดที่เป็น ✅ → เลื่อนลงไปที่ **Artifacts** → `safe-debug-apk`

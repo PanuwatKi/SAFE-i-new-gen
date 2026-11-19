@@ -9,8 +9,10 @@ venv/
 # ไฟล์ที่แอปใช้จริงคือ android/app/src/main/assets/scam_model.json ซึ่ง commit ไว้
 *.pkl
 
-# ข้อมูลที่ผู้ใช้ส่งออกจากแอป — ห้ามขึ้น repo เด็ดขาด (docs/SECURITY_POLICY.md ข้อ 5)
+# ข้อมูลจากผู้ใช้ (แอป / บอต LINE) — ห้ามขึ้น repo เด็ดขาด (docs/SECURITY_POLICY.md ข้อ 6.2)
 ml/data/contributed/
+ml/data/inbox/
+ml/data/review/
 
 # ไฟล์ระบบ
 .DS_Store

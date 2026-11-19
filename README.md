@@ -70,7 +70,12 @@ android/                 แอป Android (Kotlin + Jetpack Compose)
   app/src/main/assets/scam_model.json   โมเดลที่ส่งออกจาก Python
 ml/                      เทรน/ทดสอบโมเดลบนคอมพิวเตอร์
   data/Dataset*.csv      ข้อมูลเทรน 506 ประโยค (Dataset9_news.csv = เรียบเรียงจากข่าว + ลิงก์ที่มา)
-  data/contributed/      ข้อมูลที่ส่งออกจากแอป (ไม่ขึ้น repo)
+  data/inbox/            วาง CSV จากผู้ใช้ (แอป / Google Sheet ของบอต) ที่นี่ (ไม่ขึ้น repo)
+  data/review/           pending.csv ให้คนตรวจ + merge_log.csv (ไม่ขึ้น repo)
+  data/contributed/      ข้อมูลจากผู้ใช้ที่ผ่านด่านแล้ว (ไม่ขึ้น repo)
+  merge_contributions.py รวมข้อมูลจากผู้ใช้: ตรวจ → คนตรวจ → ด่านคุณภาพ → รวม + เทรนใหม่
+  redact.py              ลบข้อมูลส่วนตัว (ตรงกับ PiiRedactor.kt และเว็บ)
+  test_pipeline.py       ทดสอบ redact.py + merge_contributions.py
   safe_text.py           ฟังก์ชันกลาง (ต้องตรงกับ ScamClassifier.kt)
   train_model.py         เทรน + วัดผล + ส่งออกให้แอป
   export_model.py        แปลง .pkl → JSON + ตรวจว่าผลตรงกับ sklearn
@@ -93,8 +98,8 @@ SECURITY.md              ช่องทางแจ้งช่องโหว�
 - ใช้ฟีเจอร์ระดับตัวอักษรอย่างเดียว เพื่อให้ Kotlin คำนวณได้ **ตรงกับ Python ทุกตัวเลข** โดยไม่ต้องมีตัวตัดคำไทย
   และยังทนต่อการถอดเสียงสะกดผิด
 - Cross-Validation 5 รอบ (506 ประโยค รวมข้อมูลข่าว + สายจริงที่คล้ายมิจฉาชีพ): **accuracy 95.5% (±1.5%)** · precision 93.9% · recall 96.6%
-- Naive Bayes ค่าความเรียบ (alpha) 0.3 เลือกจาก CV 3 ชุดสุ่ม — ดีกว่าค่าเริ่มต้น 1.0 ทุกชุด (ดู `NB_ALPHA` ใน `ml/safe_text.py`)
   (ก่อนเพิ่มข้อมูลข่าว 96.3% ±3.7% บนชุดที่ง่ายกว่า — ชุดใหม่ยากขึ้นแต่ผลนิ่งขึ้น)
+- Naive Bayes ค่าความเรียบ (alpha) 0.3 เลือกจาก CV 3 ชุดสุ่ม — ดีกว่าค่าเริ่มต้น 1.0 ทุกชุด (ดู `NB_ALPHA` ใน `ml/safe_text.py`)
 - โมเดลเดิมทดสอบกับข้อมูลข่าวได้ 90.0% (พลาดมิจฉาชีพ 5/41) → เทรนรวมแล้วจับรูปแบบในข่าวได้
 - `export_model.py` ตรวจทุกประโยคว่าสูตรที่ส่งออกต่างจาก sklearn ไม่เกิน 0.0001%
 - `ScamClassifierTest` (Kotlin) ตรวจซ้ำอีกรอบกับ test vectors จาก Python
@@ -106,7 +111,18 @@ pip install -r requirements.txt
 python train_model.py      # เทรน + ส่งออก scam_model.json ให้แอปอัตโนมัติ
 python predict.py          # ลองพิมพ์บทสนทนาทดสอบ
 ```
-ข้อมูลที่ส่งออกจากแอป: วางไว้ใน `ml/data/contributed/` → ตรวจด้วยตาว่าไม่มีข้อมูลส่วนตัว → รัน `train_model.py`
+### เพิ่มข้อมูลจากผู้ใช้ (ข้อมูลโตขึ้นเรื่อย ๆ อย่างปลอดภัย)
+ข้อมูลจากผู้ใช้ไม่เข้า AI อัตโนมัติ ต้องผ่านคนตรวจและด่านคุณภาพก่อน กันข้อมูลส่วนตัวหลุดและกันคนแกล้งใส่ข้อมูลผิด
+1. วาง CSV ไว้ที่ `ml/data/inbox/` ตั้งชื่อให้รู้ว่าได้จากใคร เมื่อไหร่ เช่น `app_user01_2026-12-01.csv`, `line_2026-12-01.csv`
+   - จากแอป: เมนู ส่งออกข้อมูล (CSV) · จากบอต LINE: Google Sheet → ไฟล์ → ดาวน์โหลด → CSV
+2. `python merge_contributions.py` → ลบข้อมูลส่วนตัวซ้ำ · ตัดข้อความซ้ำ · เขียน `ml/data/review/pending.csv`
+   - แถวที่ต้องตรวจ (`decision` = `check`): ป้ายขัดกัน · AI เห็นต่างจากป้ายมาก · อาจมีชื่อคน/ที่อยู่ · ยาวผิดปกติ
+3. เปิด `pending.csv` เปลี่ยน `check` เป็น `keep` หรือ `drop` (Excel: บันทึกเป็น "CSV UTF-8")
+4. `python merge_contributions.py --apply` → **ด่านคุณภาพ**: เทียบโมเดลก่อน/หลังบนข้อมูลเดิมชุดเดียวกัน
+   - แย่ลงเกิน 1 จุดในตัวชี้วัดใดก็ตาม → ไม่รวม (ปรับเกณฑ์ได้ด้วย `--tolerance`)
+   - ผ่าน → `ml/data/contributed/<ชื่อไฟล์ต้นทาง>.csv` · ต้นฉบับย้ายไป `inbox/done/` · บันทึกใน `review/merge_log.csv` · เทรนใหม่ให้อัตโนมัติ
+5. รันชุดทดสอบ แล้ว commit เฉพาะ `scam_model.json` + test vectors — **ห้าม commit ข้อมูลผู้ใช้**
+6. เจ้าของข้อมูลขอให้ลบ: ดูชื่อไฟล์ใน `merge_log.csv` → ลบไฟล์นั้นใน `contributed/` → `python train_model.py`
 
 ---
 

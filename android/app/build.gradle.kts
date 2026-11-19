@@ -9,6 +9,15 @@ val firebaseProps = Properties().apply {
 }
 fun fb(key: String): String = "\"" + (firebaseProps.getProperty(key) ?: "") + "\""
 
+// กุญแจอัปโหลดสำหรับ Google Play (ไม่อยู่ใน repo) — อ่านจาก android/keystore.properties หรือตัวแปรแวดล้อม
+// ไม่มี = build รุ่น release ได้แต่ไม่เซ็น (ใช้ตรวจว่า build ผ่าน) · วิธีสร้างกุญแจ: docs/RELEASE.md
+val uploadProps = Properties().apply {
+    val f = rootProject.file("keystore.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+fun upload(key: String, env: String): String? = uploadProps.getProperty(key) ?: System.getenv(env)
+val uploadStoreFile: String? = upload("storeFile", "SAFE_UPLOAD_STORE_FILE")
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -44,10 +53,20 @@ android {
             keyAlias = "androiddebugkey"
             keyPassword = "android"
         }
+        if (uploadStoreFile != null) {
+            create("upload") {
+                storeFile = rootProject.file(uploadStoreFile)
+                storePassword = upload("storePassword", "SAFE_UPLOAD_STORE_PASSWORD")
+                keyAlias = upload("keyAlias", "SAFE_UPLOAD_KEY_ALIAS")
+                keyPassword = upload("keyPassword", "SAFE_UPLOAD_KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
         release {
+            // เซ็นด้วยกุญแจอัปโหลด (Play App Signing จะเซ็นซ้ำด้วยกุญแจจริงของ Google) — ไม่มีกุญแจ = ไม่เซ็น
+            signingConfig = signingConfigs.findByName("upload")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

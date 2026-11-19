@@ -54,6 +54,12 @@ jobs:
       - name: Build debug APK
         run: ./gradlew assembleDebug --stacktrace
 
+      # รุ่น release (บีบโค้ดด้วย R8) ต้อง build ผ่านเสมอ — ไม่เซ็น เพราะกุญแจอัปโหลดไม่อยู่ใน repo
+      # ไฟล์ที่เซ็นแล้วสำหรับ Google Play: workflow "Release bundle" (docs/RELEASE.md)
+      - name: Build release bundle (unsigned)
+        if: matrix.java == '17'
+        run: ./gradlew bundleRelease --stacktrace
+
       # ถ้าแก้ Entity แล้วไม่ได้ commit ไฟล์ schema ใหม่ = อาจลืมเขียน migration -> ให้ fail
       - name: Check Room schema is committed
         run: |

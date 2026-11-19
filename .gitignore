@@ -21,3 +21,12 @@ Thumbs.db
 # เครื่องมือเฉพาะเครื่อง
 .claude/
 .sixth/
+
+# ไฟล์แอปสำหรับเดโม (ดาวน์โหลดจาก CI ไม่ขึ้น repo)
+demo/*.apk
+
+# กุญแจอัปโหลด Google Play และรหัสผ่าน — ห้ามขึ้น repo เด็ดขาด (docs/RELEASE.md)
+android/keystore.properties
+*.jks
+*.keystore
+!android/app/debug.keystore

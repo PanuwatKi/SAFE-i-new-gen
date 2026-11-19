@@ -1,0 +1,58 @@
+# สร้างไฟล์ .aab ที่เซ็นด้วยกุญแจอัปโหลด สำหรับอัปโหลดขึ้น Google Play
+# กดรันเองที่หน้า Actions -> Release bundle -> Run workflow (ไม่รันอัตโนมัติ)
+# ต้องตั้ง secrets 4 ตัวก่อน (docs/RELEASE.md):
+#   SAFE_UPLOAD_KEYSTORE_BASE64, SAFE_UPLOAD_STORE_PASSWORD, SAFE_UPLOAD_KEY_ALIAS, SAFE_UPLOAD_KEY_PASSWORD
+name: Release bundle
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/wrapper-validation@v4
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Decode upload key
+        env:
+          KEYSTORE_B64: ${{ secrets.SAFE_UPLOAD_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_B64" ]; then
+            echo "::error::ยังไม่ได้ตั้ง secret SAFE_UPLOAD_KEYSTORE_BASE64 (ดู docs/RELEASE.md)"
+            exit 1
+          fi
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+          echo "SAFE_UPLOAD_STORE_FILE=$RUNNER_TEMP/upload.jks" >> "$GITHUB_ENV"
+
+      - name: Build signed bundle
+        env:
+          SAFE_UPLOAD_STORE_PASSWORD: ${{ secrets.SAFE_UPLOAD_STORE_PASSWORD }}
+          SAFE_UPLOAD_KEY_ALIAS: ${{ secrets.SAFE_UPLOAD_KEY_ALIAS }}
+          SAFE_UPLOAD_KEY_PASSWORD: ${{ secrets.SAFE_UPLOAD_KEY_PASSWORD }}
+        run: ./gradlew bundleRelease --stacktrace
+
+      - name: Remove key file
+        if: always()
+        run: rm -f "$RUNNER_TEMP/upload.jks"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: safe-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 7

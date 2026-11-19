@@ -2,9 +2,9 @@
 
 ## 1. ต้องมีก่อนส่งแอป
 - [ ] บัญชี Google Play Console (ค่าสมัครครั้งเดียว $25) — บัญชีส่วนตัวที่สร้างใหม่ต้องทดสอบแบบ closed test กับผู้ทดสอบ ≥ 12 คน ติดต่อกัน 14 วันก่อนเปิดสาธารณะ
-- [ ] **URL นโยบายความเป็นส่วนตัวแบบสาธารณะ** — repo เป็น private จึงใช้ GitHub Pages ฟรีไม่ได้ ทางเลือก: Google Sites, หรือ repo public แยกที่มีแค่ไฟล์นโยบาย เนื้อหาใช้ [PRIVACY_POLICY.md](PRIVACY_POLICY.md)
-- [ ] สร้างกุญแจเซ็นแอป (upload key) + เปิด **Play App Signing** — ห้ามขึ้น repo (ดู [SECURITY_POLICY.md](SECURITY_POLICY.md) ข้อ 6)
-- [ ] ไอคอน 512×512, ภาพหน้าจอ ≥ 2 รูป, feature graphic 1024×500
+- [ ] **URL นโยบายความเป็นส่วนตัวแบบสาธารณะ** — repo เป็น private จึงใช้ GitHub Pages ฟรีไม่ได้ → Google Sites: วางเนื้อหาจาก [`store/privacy_policy.html`](store/privacy_policy.html) (สร้างจาก [PRIVACY_POLICY.md](PRIVACY_POLICY.md) ด้วย `python docs/store/build_privacy_html.py`)
+- [ ] สร้างกุญแจเซ็นแอป (upload key) + เปิด **Play App Signing** — ห้ามขึ้น repo · ขั้นตอนใน [RELEASE.md](RELEASE.md) (ดู [SECURITY_POLICY.md](SECURITY_POLICY.md) ข้อ 7 ด้วย)
+- [x] ไอคอน 512×512, ภาพหน้าจอ 5 รูป, feature graphic 1024×500 และข้อความหน้าร้านไทย/อังกฤษ — เตรียมแล้วใน [`store/`](store/STORE_LISTING.md)
 - [ ] ทดสอบบนเครื่องจริงอย่างน้อย Samsung + OPPO/Xiaomi (ฟีเจอร์ตรวจไฟล์อัดเสียงสายขึ้นกับยี่ห้อ)
 - [ ] ถ้าเปิดฐานข้อมูลชุมชน: ทำตาม [FIREBASE_SETUP.md](FIREBASE_SETUP.md) และ **Enforce App Check** ก่อนเปิดตัว
 - [x] ~~เปลี่ยน `fallbackToDestructiveMigration` ของ Room เป็น Migration จริง~~ — ทำแล้ว (schema ถูกเก็บใน `android/app/schemas/` และ CI ตรวจทุกครั้ง)

@@ -251,7 +251,8 @@ var SAFE = (function () {
 
   // ---------------- ลบข้อมูลส่วนตัว (ตรงกับ PiiRedactor.kt) ----------------
   var EMAIL_RE = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g;
-  var URL_REDACT_RE = /\b(?:https?:\/\/|www\.)\S+|\b[a-z0-9-]+\.(?:com|net|org|co|th|ly|me|io|xyz|link|app|cc|info)(?:\/\S*)?/gi;
+  // โดเมนหลายชั้นได้ (scb.co.th) และ TLD ต้องจบคำ (x.comic ไม่ใช่ลิงก์)
+  var URL_REDACT_RE = /\b(?:https?:\/\/|www\.)\S+|\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|net|org|co|th|ly|me|io|xyz|link|app|cc|info)(?![a-z0-9-])(?:\/\S*)?/gi;
   var DIGITS_RE = /\+?\d(?:[\d\s\-.]*\d)?/g;
   function redact(text) {
     var t = String(text).replace(/[๐-๙]/g, function (c) { return String(c.charCodeAt(0) - 0x0E50); });

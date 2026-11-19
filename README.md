@@ -175,6 +175,7 @@ gh run download --repo PanuwatKi/SAFE-i-new-gen --name safe-debug-apk
 - ทดสอบละเอียด + สร้างกราฟ: `cd ml && python evaluate.py` → [`docs/report/`](docs/report/) (กราฟ 6 รูป + `metrics.json`)
 - ความแม่นยำ 95.5% (5-fold CV) · จับมิจฉาชีพได้มากกว่าการตรวจคำต้องห้ามกว่า 30 จุด · ทนถอดเสียงผิด 20% (93.1%)
 - เตรียมแข่ง I-New Gen Award รอบระดับประเทศ: [docs/COMPETITION_GUIDE.md](docs/COMPETITION_GUIDE.md)
+- **สิ่งที่เจ้าของโครงการต้องทำ เรียงตามลำดับ:** [docs/OWNER_TODO.md](docs/OWNER_TODO.md)
 
 ## 🗺️ แผนถัดไป
 - ฝังตัวถอดเสียงออฟไลน์ (whisper.cpp) แทนบริการถอดเสียงของระบบ → ออฟไลน์ 100% จริง และถอดไฟล์ได้ทุกเครื่อง

@@ -18,7 +18,8 @@ object PiiRedactor {
     const val PHONE = "[เบอร์โทร]"
     const val NUMBER = "[ตัวเลข]"
 
-    private val url = Regex("""(?i)\b(?:https?://|www\.)\S+|\b[a-z0-9-]+\.(?:com|net|org|co|th|ly|me|io|xyz|link|app|cc|info)(?:/\S*)?""")
+    // โดเมนหลายชั้นได้ (scb.co.th) และ TLD ต้องจบคำ (x.comic ไม่ใช่ลิงก์) — ตรงกับ web/safe-core.js และ ml/redact.py
+    private val url = Regex("""(?i)\b(?:https?://|www\.)\S+|\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|net|org|co|th|ly|me|io|xyz|link|app|cc|info)(?![a-z0-9-])(?:/\S*)?""")
     private val email = Regex("""[\w.+-]+@[\w-]+(?:\.[\w-]+)+""")
     // ตัวเลขที่อาจมี + นำหน้า และมีช่องว่าง/ขีด/จุดคั่นได้
     private val digits = Regex("""\+?\d(?:[\d\s\-.]*\d)?""")

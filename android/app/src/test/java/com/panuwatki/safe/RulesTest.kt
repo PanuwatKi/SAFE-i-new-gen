@@ -29,6 +29,8 @@ class PiiRedactorTest {
     fun redactsLinksAndEmails() {
         assertEquals("กด ${PiiRedactor.LINK} เลย", PiiRedactor.redact("กด https://bit.ly/abc123 เลย"))
         assertEquals("กด ${PiiRedactor.LINK} เลย", PiiRedactor.redact("กด thai-post.xyz/track เลย"))
+        assertEquals("โอนผ่าน ${PiiRedactor.LINK} ด่วน", PiiRedactor.redact("โอนผ่าน scb.co.th/abc ด่วน"))
+        assertEquals("อ่าน x.comic นะ", PiiRedactor.redact("อ่าน x.comic นะ"))
         assertEquals("ส่งมา ${PiiRedactor.EMAIL}", PiiRedactor.redact("ส่งมา somchai@example.com"))
     }
 

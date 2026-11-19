@@ -19,8 +19,10 @@ NUMBER = "[ตัวเลข]"
 
 # re.ASCII ให้ \b ตัดคำแบบเดียวกับ JavaScript (ตัวอักษรไทยไม่นับเป็นส่วนของคำ)
 _EMAIL_RE = re.compile(r"[A-Za-z0-9_.+-]+@[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)+")
+# โดเมนหลายชั้นได้ (scb.co.th) และ TLD ต้องจบคำ (x.comic ไม่ใช่ลิงก์)
 _URL_RE = re.compile(
-    r"\b(?:https?://|www\.)\S+|\b[a-z0-9-]+\.(?:com|net|org|co|th|ly|me|io|xyz|link|app|cc|info)(?:/\S*)?",
+    r"\b(?:https?://|www\.)\S+"
+    r"|\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|net|org|co|th|ly|me|io|xyz|link|app|cc|info)(?![a-z0-9-])(?:/\S*)?",
     re.IGNORECASE | re.ASCII,
 )
 # ตัวเลขที่อาจมี + นำหน้า และมีช่องว่าง/ขีด/จุดคั่นได้ (\s แบบ Unicode เหมือน JavaScript)

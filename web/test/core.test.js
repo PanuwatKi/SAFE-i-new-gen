@@ -97,6 +97,8 @@ test("redaction matches PiiRedactorTest.kt", () => {
   assert.equal(SAFE.redact("บัญชี 123-4-56789-0"), "บัญชี [ตัวเลข]");
   assert.equal(SAFE.redact("รหัส ๔๘๒๙๑๓"), "รหัส [ตัวเลข]");
   assert.equal(SAFE.redact("กด https://bit.ly/abc123 เลย"), "กด [ลิงก์] เลย");
+  assert.equal(SAFE.redact("โอนผ่าน scb.co.th/abc ด่วน"), "โอนผ่าน [ลิงก์] ด่วน");
+  assert.equal(SAFE.redact("อ่าน x.comic นะ"), "อ่าน x.comic นะ");
   assert.equal(SAFE.redact("ส่งมา somchai@example.com"), "ส่งมา [อีเมล]");
   assert.equal(SAFE.redact("ค่าปรับ 350 บาท ภายใน 24 ชม."), "ค่าปรับ 350 บาท ภายใน 24 ชม.");
 });

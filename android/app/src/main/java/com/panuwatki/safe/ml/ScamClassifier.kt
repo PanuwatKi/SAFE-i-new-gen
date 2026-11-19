@@ -28,8 +28,17 @@ class ScamClassifier(private val model: ModelFile) {
     val modelCreatedAt: String get() = model.createdAt
     val featureCount: Int get() = model.terms.size
 
-    /** % โอกาสเป็นมิจฉาชีพ (0-100) */
+    /** % โอกาสเป็นมิจฉาชีพ (0-100) — น้ำหนักหลักฐานผ่านตัวปรับ % (sigmoid calibration) */
     fun scamPercent(text: String): Double {
+        val p = 1.0 / (1.0 + exp(-evidence(text)))
+        return 100.0 / (1.0 + exp(model.calibration.a * p + model.calibration.b))
+    }
+
+    /**
+     * น้ำหนักหลักฐานดิบของ Naive Bayes (log-odds ก่อนปรับเป็น %) — ไม่มีเพดาน
+     * จึงใช้อธิบายคำได้แม้ % ชนเพดานแล้ว (ข้อความมิจฉาชีพชัด ๆ ได้ % เท่ากันหมด)
+     */
+    fun evidence(text: String): Double {
         val counts = HashMap<Int, Int>()
         for (g in charWbNgrams(normalize(text), minN, maxN)) {
             val i = index[g] ?: continue
@@ -47,8 +56,7 @@ class ScamClassifier(private val model: ModelFile) {
             val norm = sqrt(normSq)
             for ((i, v) in values) z += v / norm * model.weights[i]
         }
-        val p = 1.0 / (1.0 + exp(-z))
-        return 100.0 / (1.0 + exp(model.calibration.a * p + model.calibration.b))
+        return z
     }
 
     fun colorOf(percent: Double): RiskColor = when {
@@ -63,23 +71,18 @@ class ScamClassifier(private val model: ModelFile) {
     }
 
     /**
-     * อธิบายว่า "คำไหน" ทำให้ AI สงสัย: ลองตัดทีละคำออก แล้วดูว่าความเสี่ยงลดลงเท่าไหร่
+     * อธิบายว่า "คำไหน" ทำให้ AI สงสัย: ลองตัดทีละคำออก แล้วดูว่าน้ำหนักหลักฐานลดลงเท่าไหร่
      * (ตัดคำด้วย BreakIterator ภาษาไทยของระบบ — ใช้แค่เพื่ออธิบาย ไม่กระทบตัวเลข %)
      */
     fun explain(text: String, topN: Int = 5): List<String> {
-        val base = logit(scamPercent(text))
+        val base = evidence(text)
         val drops = mutableListOf<Pair<String, Double>>()
         for (word in thaiWords(text).distinct()) {
             if (word.length < 2) continue
-            val drop = base - logit(scamPercent(text.replace(word, " ")))
+            val drop = base - evidence(text.replace(word, " "))
             if (drop > 0.1) drops += word to drop
         }
         return drops.sortedByDescending { it.second }.take(topN).map { it.first }
-    }
-
-    private fun logit(percent: Double): Double {
-        val p = (percent / 100.0).coerceIn(1e-9, 1 - 1e-9)
-        return ln(p / (1 - p))
     }
 
     companion object {

@@ -8,7 +8,6 @@ predict.py — เครื่องมือทดสอบโมเดลบ�
     python predict.py --wav call.wav  # ถอดเสียงไฟล์ด้วย Whisper แล้ววิเคราะห์ (pip install -r requirements-audio.txt)
 """
 import argparse
-import math
 import os
 import sys
 
@@ -32,12 +31,16 @@ RESET_WORDS = {"จบ", "จบสาย", "สายใหม่", "reset", "e
 
 
 def explain_words(text, model, vectorizer, topn=5):
-    """คำไหนทำให้ AI สงสัย: ลองตัดทีละคำออก แล้วดูว่า % มิจฉาชีพลดลงเท่าไหร่"""
+    """คำไหนทำให้ AI สงสัย: ลองตัดทีละคำออก แล้วดูว่าน้ำหนักหลักฐานลดลงเท่าไหร่
+    ใช้ log-odds ดิบของ Naive Bayes (ก่อนปรับเป็น %) เพราะ % ของข้อความมิจฉาชีพชัด ๆ ชนเพดานเท่ากันหมด"""
     from pythainlp.tokenize import word_tokenize
 
+    nb = model.calibrated_classifiers_[0].estimator
+    scam_col = list(nb.classes_).index(1)
+
     def logit(t):
-        p = min(max(scam_percent(t, model, vectorizer) / 100, 1e-9), 1 - 1e-9)
-        return math.log(p / (1 - p))
+        lp = nb.predict_log_proba(vectorizer.transform([t]))[0]
+        return lp[scam_col] - lp[1 - scam_col]
 
     base, seen, out = logit(text), set(), []
     for tok in word_tokenize(text, engine="newmm"):

@@ -25,14 +25,12 @@ import joblib
 import matplotlib
 import numpy as np
 import pandas as pd
-from sklearn.calibration import CalibratedClassifierCV
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import confusion_matrix, f1_score, precision_score, recall_score, roc_auc_score
 from sklearn.model_selection import StratifiedKFold
-from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 
-from safe_text import RED_THRESHOLD, YELLOW_THRESHOLD, make_vectorizer, normalize_text
+from safe_text import RED_THRESHOLD, YELLOW_THRESHOLD, make_classifier, make_vectorizer, normalize_text
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
@@ -94,8 +92,7 @@ def merge_category(cat):
 
 
 def safe_model():
-    return Pipeline([("v", make_vectorizer()),
-                     ("c", CalibratedClassifierCV(MultinomialNB(), method="sigmoid", cv=5, ensemble=False))])
+    return Pipeline([("v", make_vectorizer()), ("c", make_classifier())])
 
 
 def word_model():
@@ -103,7 +100,7 @@ def word_model():
     from pythainlp.tokenize import word_tokenize
     vec = TfidfVectorizer(preprocessor=normalize_text, tokenizer=lambda t: word_tokenize(t, engine="newmm"),
                           token_pattern=None, ngram_range=(1, 2), sublinear_tf=True)
-    return Pipeline([("v", vec), ("c", CalibratedClassifierCV(MultinomialNB(), method="sigmoid", cv=5, ensemble=False))])
+    return Pipeline([("v", vec), ("c", make_classifier())])   # ตัวจำแนกเดียวกัน ต่างแค่วิธีแยกข้อความ
 
 
 def keyword_flag(text):

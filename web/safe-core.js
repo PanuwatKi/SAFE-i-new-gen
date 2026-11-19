@@ -56,7 +56,14 @@ var SAFE = (function () {
     model.terms.forEach(function (t, i) { index.set(t, i); });
     var minN = model.ngram_range[0], maxN = model.ngram_range[1];
 
+    /** % โอกาสเป็นมิจฉาชีพ — น้ำหนักหลักฐานผ่านตัวปรับ % (ตรงกับ ScamClassifier.kt) */
     function scamPercent(text) {
+      var p = 1 / (1 + Math.exp(-evidence(text)));
+      return 100 / (1 + Math.exp(model.calibration.a * p + model.calibration.b));
+    }
+
+    /** น้ำหนักหลักฐานดิบของ Naive Bayes (log-odds ก่อนปรับเป็น %) — ไม่มีเพดาน ใช้อธิบายคำ */
+    function evidence(text) {
       var counts = new Map();
       charWbNgrams(normalize(text), minN, maxN).forEach(function (g) {
         var i = index.get(g);
@@ -73,8 +80,7 @@ var SAFE = (function () {
         var norm = Math.sqrt(normSq);
         values.forEach(function (iv) { z += (iv[1] / norm) * model.weights[iv[0]]; });
       }
-      var p = 1 / (1 + Math.exp(-z));
-      return 100 / (1 + Math.exp(model.calibration.a * p + model.calibration.b));
+      return z;
     }
 
     function colorOf(percent) {
@@ -83,23 +89,18 @@ var SAFE = (function () {
       return "GREEN";
     }
 
-    function logit(percent) {
-      var p = Math.min(Math.max(percent / 100, 1e-9), 1 - 1e-9);
-      return Math.log(p / (1 - p));
-    }
-
     /** คำที่ทำให้สงสัย (ตัดคำด้วย Intl.Segmenter ถ้าเบราว์เซอร์/ระบบรองรับ — ใช้อธิบายเท่านั้น) */
     function explain(text, topN) {
       topN = topN || 5;
       if (typeof Intl === "undefined" || typeof Intl.Segmenter !== "function") return [];
       var seg = new Intl.Segmenter("th", { granularity: "word" });
-      var base = logit(scamPercent(text));
+      var base = evidence(text);
       var seen = new Set(), drops = [];
       for (var s of seg.segment(text)) {
         var w = s.segment.trim();
         if (!s.isWordLike || Array.from(w).length < 2 || seen.has(w)) continue;
         seen.add(w);
-        var drop = base - logit(scamPercent(text.split(w).join(" ")));
+        var drop = base - evidence(text.split(w).join(" "));
         if (drop > 0.1) drops.push([w, drop]);
       }
       drops.sort(function (a, b) { return b[1] - a[1]; });
@@ -108,6 +109,7 @@ var SAFE = (function () {
 
     return {
       scamPercent: scamPercent,
+      evidence: evidence,
       colorOf: colorOf,
       classify: function (text) { var p = scamPercent(text); return { percent: p, color: colorOf(p) }; },
       explain: explain,

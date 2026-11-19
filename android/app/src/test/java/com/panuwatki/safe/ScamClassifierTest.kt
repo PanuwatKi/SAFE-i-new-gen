@@ -66,6 +66,14 @@ class ScamClassifierTest {
     }
 
     @Test
+    fun explainWorksEvenWhenPercentIsAtCeiling() {
+        // ข้อความนี้ได้ % ชนเพดานของตัวปรับ % — อธิบายต้องยังหาคำได้ (ใช้น้ำหนักหลักฐานดิบ)
+        val text = "โทรจากธนาคาร บัญชีของคุณถูกอายัด ต้องโอนเงินด่วน"
+        assertTrue(classifier.evidence(text) > classifier.evidence(text.replace("โอน", " ")))
+        assertTrue(classifier.explain(text).isNotEmpty())
+    }
+
+    @Test
     fun conversationKeepsPeak() {
         val c = Conversation(classifier)
         assertFalse(c.add("ฮัลโหล").enoughData)

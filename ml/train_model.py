@@ -20,13 +20,11 @@ import sys
 
 import joblib
 import pandas as pd
-from sklearn.calibration import CalibratedClassifierCV
 from sklearn.metrics import classification_report
 from sklearn.model_selection import StratifiedKFold, cross_validate, train_test_split
-from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 
-from safe_text import make_vectorizer
+from safe_text import make_classifier, make_vectorizer
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -36,12 +34,6 @@ except Exception:
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(HERE, "data")
 MODEL_DIR = os.path.join(HERE, "model")
-
-
-def make_classifier():
-    # ensemble=False = ได้ Naive Bayes 1 ตัว + ตัวปรับ % (sigmoid) 1 ชุด -> ส่งออกไปมือถือได้ง่าย
-    # sigmoid calibration ทำให้ % "สมจริง" ขึ้น ไม่เด้งไป 0/100 ตลอด (โซนเหลืองขึ้นได้จริง)
-    return CalibratedClassifierCV(MultinomialNB(), method="sigmoid", cv=5, ensemble=False)
 
 
 def load_data():

@@ -24,6 +24,11 @@ YELLOW_THRESHOLD = 40  # 40-69%  -> เหลือง (น่าสงสัย
 # ช่วงความยาวชิ้นตัวอักษรที่ใช้เป็นฟีเจอร์
 NGRAM_RANGE = (2, 5)
 
+# ค่าความเรียบ (smoothing) ของ Naive Bayes — ค่าน้อย = เชื่อหลักฐานในข้อมูลมากขึ้น
+# 0.3 เลือกจาก Cross-Validation 3 ชุดสุ่ม: ดีกว่าค่าเริ่มต้น 1.0 ทุกชุด ทั้งความแม่นยำ
+# การจับมิจฉาชีพ การขึ้นแดงผิด และ log-loss (วัดว่ามั่นใจผิดบ่อยแค่ไหน)
+NB_ALPHA = 0.3
+
 _REPEAT_RE = re.compile(r"(.{2,15}?)\1{2,}")
 
 
@@ -46,6 +51,15 @@ def make_vectorizer():
         ngram_range=NGRAM_RANGE,
         sublinear_tf=True,
     )
+
+
+def make_classifier():
+    """Naive Bayes 1 ตัว + ตัวปรับ % (sigmoid calibration) 1 ชุด
+    - ensemble=False -> ส่งออกไปมือถือได้ง่าย (export_model.py)
+    - calibration ลดนิสัย "มั่นใจเกินจริง" ของ Naive Bayes ให้ % ใกล้ความจริงขึ้น"""
+    from sklearn.calibration import CalibratedClassifierCV
+    from sklearn.naive_bayes import MultinomialNB
+    return CalibratedClassifierCV(MultinomialNB(alpha=NB_ALPHA), method="sigmoid", cv=5, ensemble=False)
 
 
 def color_of(scam_percent):

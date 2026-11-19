@@ -49,7 +49,9 @@ cd android; .\gradlew.bat bundleRelease
 ## 4. อัปโหลดขึ้น Play Console
 1. สร้างแอปใหม่ ชื่อ SAFE · ภาษาไทย · ฟรี · เปิด **Play App Signing** (ค่าเริ่มต้นของแอปใหม่)
 2. **Testing → Internal testing** อัปโหลด `.aab` ก่อน ลองติดตั้งผ่าน Play Store กับตัวเอง
-3. **Closed testing** เชิญผู้ทดสอบ 12 คน ครบ 14 วัน (เงื่อนไขของบัญชีนักพัฒนาใหม่)
-4. กรอกหน้าร้าน + Data safety ตาม `docs/PLAY_STORE_CHECKLIST.md` และ `docs/store/` → ขอเปิด **Production**
+3. **Closed testing** (Internal testing ไม่นับ) ใส่อีเมลผู้ทดสอบหรือ Google Group → ส่ง **ลิงก์ร่วมทดสอบ (opt-in link)** ให้ทุกคน → แต่ละคนกด "เป็นผู้ทดสอบ" แล้วติดตั้งจาก Play Store
+   - ผู้ทดสอบที่เคยลงรุ่นจาก GitHub Releases **ต้องถอนแอปเดิมก่อน** เพราะรุ่นทดสอบเซ็นด้วยกุญแจคนละชุดกับรุ่นใน Play จึงติดตั้งทับกันไม่ได้
+   - ต้องมีอย่างน้อย 12 คนที่อยู่ในการทดสอบต่อเนื่อง 14 วัน ณ วันที่กดขอเปิดจริง ([เงื่อนไขของ Google](https://support.google.com/googleplay/android-developer/answer/14151465))
+4. กรอกหน้าร้าน + Data safety ตาม `docs/PLAY_STORE_CHECKLIST.md` และ `docs/store/` → Dashboard → **Apply for production** (ตอบคำถามเรื่องผลการทดสอบ) → Google มักตรวจภายใน 7 วัน
 
 ถ้าเปิดใช้ฐานข้อมูลเบอร์ชุมชน: สร้าง `android/firebase.properties` (docs/FIREBASE_SETUP.md) **ก่อน** build รุ่นที่จะอัปโหลด และลงทะเบียนลายนิ้วมือกุญแจใน Firebase App Check

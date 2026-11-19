@@ -9,10 +9,11 @@ AI คัดกรองบทสนทนาทำงาน **ในเคร�
 ---
 
 ## 🧪 ลองแอปบนมือถือ Android (สำหรับผู้ทดสอบ)
-1. ล็อกอิน GitHub ก่อน (สมัครฟรี) — ไฟล์แอปจาก Actions ต้องล็อกอินถึงจะดาวน์โหลดได้
-2. เปิด [Actions → Android CI](https://github.com/PanuwatKi/SAFE-i-new-gen/actions/workflows/android.yml) → กดรอบบนสุดที่มี ✅ สีเขียว → เลื่อนลงไปที่ **Artifacts** → กด **safe-debug-apk**
-3. แตกไฟล์ zip → ส่งไฟล์ `.apk` เข้ามือถือ (สาย USB, LINE Keep หรือ Google Drive) → แตะเพื่อติดตั้ง → อนุญาต "ติดตั้งแอปที่ไม่รู้จัก" เฉพาะตอนนี้ แล้วปิดกลับ
-4. ทดสอบตาม[แบบฟอร์มทดสอบ](docs/PHONE_TEST_FORM.md) แล้วส่งผลและภาพหน้าจอกลับมาให้ทีม
+1. บนมือถือ เปิดหน้า [**Releases**](https://github.com/PanuwatKi/SAFE-i-new-gen/releases) → รุ่นทดสอบล่าสุด → กดไฟล์ `.apk` เพื่อดาวน์โหลด (ไม่ต้องล็อกอิน)
+2. เปิดไฟล์ → อนุญาต "ติดตั้งแอปที่ไม่รู้จัก" เฉพาะตอนนี้ แล้วปิดกลับหลังติดตั้ง
+3. ทดสอบตาม[แบบฟอร์มทดสอบ](docs/PHONE_TEST_FORM.md) แล้วส่งผลและภาพหน้าจอกลับมาให้ทีม
+
+ดาวน์โหลดจากหน้า Releases ของ repo นี้เท่านั้น · อยากได้รุ่นที่ใหม่กว่า Release: ล็อกอิน GitHub แล้วไปที่ [Actions → Android CI](https://github.com/PanuwatKi/SAFE-i-new-gen/actions/workflows/android.yml) → รอบบนสุดที่มี ✅ → Artifacts → **safe-debug-apk**
 
 รุ่นทดสอบติดตั้งรุ่นใหม่ทับรุ่นเก่าได้เลย ข้อมูลไม่หาย · แอปไม่มีโฆษณา และไม่ขอสิทธิ์อ่านรายชื่อติดต่อหรือ SMS · ไม่มีมือถือ Android? ลอง[เว็บแอป](https://claude.ai/artifact/D7opqhSYTc4rEz7yw54eNd)ได้ทั้ง iPhone และ Android
 
